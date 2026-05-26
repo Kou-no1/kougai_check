@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>チェックポイント通過管理</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, 'Hiragino Sans', sans-serif; background: #f5f5f5; color: #1a1a1a; font-size: 15px; }
+
+.header { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 12px 16px; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 10; }
+.header-title { font-size: 16px; font-weight: 600; flex: 1; }
+.header-event { font-size: 12px; color: #6b7280; margin-top: 1px; }
+.sync-badge { font-size: 11px; padding: 3px 8px; border-radius: 999px; background: #dcfce7; color: #166534; }
+.sync-badge.syncing { background: #fef9c3; color: #854d0e; }
+.sync-badge.error { background: #fee2e2; color: #991b1b; }
+
+.tabs { display: flex; background: #fff; border-bottom: 1px solid #e5e7eb; }
+.tab { flex: 1; padding: 11px 0; text-align: center; font-size: 13px; color: #6b7280; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; }
+.tab.active { color: #111; border-bottom-color: #111; font-weight: 500; }
+
+.page { display: none; padding: 16px; }
+.page.active { display: block; }
+
+.card { background: #fff; border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; border: 1px solid #e5e7eb; }
+.card-label { font-size: 12px; color: #6b7280; margin-bottom: 8px; }
+input[type=text], input[type=number] { width: 100%; border: 1px solid #d1d5db; border-radius: 8px; padding: 9px 12px; font-size: 14px; outline: none; }
+input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+.btn { display: inline-flex; align-items: center; gap: 5px; border: 1px solid #d1d5db; border-radius: 8px; padding: 8px 14px; font-size: 13px; background: #fff; cursor: pointer; color: #374151; }
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: #111; color: #fff; border-color: #111; }
+.btn-danger { border-color: #fca5a5; color: #dc2626; }
+.btn-row { display: flex; gap: 8px; margin-top: 8px; }
+.tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.tag { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; padding: 4px 10px; border-radius: 999px; background: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
+.tag-del { background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 15px; line-height: 1; padding: 0 2px; }
+
+/* チェックイン マトリクス */
+.ci-wrap { padding: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.ci-matrix { border-collapse: separate; border-spacing: 0; min-width: 100%; }
+
+/* 固定列（班名） */
+.ci-matrix .col-group {
+  position: sticky; left: 0; z-index: 3;
+  background: #f9fafb;
+  min-width: 72px; max-width: 88px;
+  padding: 10px 10px;
+  font-size: 13px; font-weight: 600;
+  border-right: 2px solid #d1d5db;
+  border-bottom: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+.ci-matrix thead .col-group {
+  background: #f3f4f6; color: #6b7280; font-size: 11px; font-weight: 500;
+  border-bottom: 2px solid #d1d5db;
+}
+
+/* CP列ヘッダー */
+.ci-matrix thead th.col-cp {
+  background: #f3f4f6;
+  padding: 8px 6px 6px;
+  font-size: 11px; font-weight: 500; color: #374151;
+  text-align: center;
+  border-bottom: 2px solid #d1d5db;
+  border-right: 1px solid #e5e7eb;
+  white-space: nowrap; min-width: 80px;
+}
+.cp-th-name { font-size: 12px; font-weight: 600; color: #111; }
+.cp-th-count { font-size: 10px; color: #6b7280; margin-top: 2px; }
+
+/* タイルセル */
+.ci-matrix td.tile-cell {
+  padding: 5px;
+  border-right: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
+  min-width: 80px;
+}
+.tile {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border-radius: 8px; padding: 8px 4px;
+  min-height: 52px; cursor: pointer;
+  border: 1.5px solid #e5e7eb;
+  background: #f9fafb;
+  user-select: none; -webkit-tap-highlight-color: transparent;
+  transition: transform 0.08s;
+}
+.tile:active { transform: scale(0.94); }
+.tile.passed {
+  background: #f0fdf4; border-color: #86efac;
+}
+.tile.passed .tile-icon { color: #16a34a; }
+.tile.passed .tile-time { color: #16a34a; }
+.tile-icon { font-size: 18px; line-height: 1; }
+.tile-time { font-size: 10px; color: #9ca3af; margin-top: 3px; min-height: 13px; }
+
+/* 行の縞模様 */
+.ci-matrix tbody tr:nth-child(even) .col-group { background: #f0f0f0; }
+.ci-matrix tbody tr:nth-child(even) td.tile-cell { background: #fafafa; }
+.ci-matrix tbody tr:nth-child(odd) .col-group { background: #f9fafb; }
+
+/* 全通過行ハイライト */
+.ci-matrix tbody tr.all-passed .col-group { color: #15803d; }
+
+/* 凡例・サマリーバー */
+.ci-summary {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 10px 16px; background: #fff;
+  border-bottom: 1px solid #e5e7eb; font-size: 12px; color: #6b7280;
+}
+.ci-summary-item { display: flex; align-items: center; gap: 5px; }
+.legend-box { width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid; }
+.legend-passed { background: #f0fdf4; border-color: #86efac; }
+.legend-none { background: #f9fafb; border-color: #e5e7eb; }
+
+/* 一覧 */
+.metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+.metric { background: #fff; border-radius: 10px; padding: 10px 12px; border: 1px solid #e5e7eb; }
+.metric-label { font-size: 11px; color: #6b7280; }
+.metric-val { font-size: 22px; font-weight: 600; margin-top: 2px; }
+
+.filter-row { display: flex; gap: 6px; margin-bottom: 10px; overflow-x: auto; }
+.filter-btn { white-space: nowrap; font-size: 12px; padding: 5px 12px; border-radius: 999px; border: 1px solid #e5e7eb; background: #fff; color: #374151; cursor: pointer; }
+.filter-btn.active { background: #111; color: #fff; border-color: #111; }
+
+.ov-table-wrap { background: #fff; border-radius: 12px; border: 1px solid #e5e7eb; overflow: hidden; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; padding: 8px 10px; background: #f9fafb; font-size: 11px; color: #6b7280; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
+td { padding: 9px 10px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+.pass { color: #16a34a; font-size: 12px; }
+.fail { color: #dc2626; font-size: 12px; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
+.dot.ok { background: #16a34a; }
+.dot.ng { background: #dc2626; }
+
+.empty { text-align: center; padding: 2.5rem; color: #9ca3af; font-size: 13px; }
+.notice { background: #fef9c3; color: #854d0e; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div style="flex:1">
+    <div class="header-title">📍 CP通過管理</div>
+    <div class="header-event" id="hdr-event">読み込み中...</div>
+  </div>
+  <span class="sync-badge syncing" id="sync-badge">同期中</span>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('setup')">⚙️ 設定</button>
+  <button class="tab" onclick="showTab('checkin')">✅ チェックイン</button>
+  <button class="tab" onclick="showTab('overview')">📋 一覧</button>
+</div>
+
+<!-- ======== 設定 ======== -->
+<div class="page active" id="page-setup">
+  <div class="card">
+    <div class="card-label">行事名</div>
+    <input type="text" id="inp-event" placeholder="例: 6年2組 修学旅行 2日目">
+  </div>
+  <div class="card">
+    <div class="card-label">チェックポイント</div>
+    <div style="display:flex;gap:8px">
+      <input type="text" id="inp-cp" placeholder="例: 第1関門（公園入口）" style="flex:1">
+      <button class="btn" onclick="addCP()">追加</button>
+    </div>
+    <div class="tag-list" id="cp-tags"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">班</div>
+    <div style="display:flex;gap:8px">
+      <input type="text" id="inp-group" placeholder="例: 1班" style="flex:1">
+      <button class="btn" onclick="addGroup()">追加</button>
+    </div>
+    <div class="btn-row">
+      <input type="number" id="inp-gcount" placeholder="班の数" min="1" max="30" style="width:100px">
+      <button class="btn" onclick="bulkGroups()">まとめて追加</button>
+    </div>
+    <div class="tag-list" id="group-tags"></div>
+  </div>
+  <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px" onclick="saveConfig()">
+    💾 設定を保存してチェックインへ
+  </button>
+  <div id="setup-msg" style="margin-top:10px;font-size:13px;color:#6b7280;text-align:center"></div>
+</div>
+
+<!-- ======== チェックイン ======== -->
+<div class="page" id="page-checkin" style="padding:0">
+  <div class="ci-summary">
+    <div class="ci-summary-item">
+      <div class="legend-box legend-passed"></div><span>通過済</span>
+    </div>
+    <div class="ci-summary-item">
+      <div class="legend-box legend-none"></div><span>未通過</span>
+    </div>
+    <div style="flex:1"></div>
+    <span id="ci-progress" style="font-weight:600;color:#111"></span>
+  </div>
+  <div class="ci-wrap">
+    <table class="ci-matrix" id="ci-matrix">
+      <thead><tr id="ci-header"></tr></thead>
+      <tbody id="ci-body"></tbody>
+    </table>
+  </div>
+  <div style="padding:10px 16px;font-size:11px;color:#9ca3af">
+    ※ タイルをタップで通過記録・もう一度タップで取消
+  </div>
+</div>
+
+<!-- ======== 一覧 ======== -->
+<div class="page" id="page-overview">
+  <div class="metrics">
+    <div class="metric"><div class="metric-label">総通過数</div><div class="metric-val" id="m-total">0</div></div>
+    <div class="metric"><div class="metric-label">全完了班</div><div class="metric-val" id="m-ok">0</div></div>
+    <div class="metric"><div class="metric-label">未通過あり</div><div class="metric-val" id="m-ng">0</div></div>
+  </div>
+  <div class="filter-row">
+    <button class="filter-btn active" id="f-all" onclick="setFilter('all')">全班</button>
+    <button class="filter-btn" id="f-ok" onclick="setFilter('ok')">全完了</button>
+    <button class="filter-btn" id="f-ng" onclick="setFilter('ng')">未通過あり</button>
+  </div>
+  <div class="ov-table-wrap">
+    <table>
+      <thead><tr id="ov-header"></tr></thead>
+      <tbody id="ov-body"></tbody>
+    </table>
+  </div>
+  <div style="margin-top:10px;display:flex;gap:8px">
+    <button class="btn" onclick="copyText()" style="font-size:12px">📋 テキストコピー</button>
+    <button class="btn btn-danger" onclick="confirmReset()" style="font-size:12px">🗑 記録リセット</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  設定 — デプロイ後にURLを差し替えてください
+// ============================================================
+const GAS_URL = '<?= ScriptApp.getService().getUrl() ?>';
+
+// ============================================================
+//  状態
+// ============================================================
+let state = {
+  eventName: '', checkpoints: [], groups: [], records: {},
+  selectedCP: null, filter: 'all'
+};
+let polling = null;
+
+// ============================================================
+//  タブ切替
+// ============================================================
+function showTab(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  event.target.classList.add('active');
+  if (name === 'overview') renderOverview();
+}
+
+// ============================================================
+//  API通信
+// ============================================================
+async function api(params) {
+  const qs = new URLSearchParams(params).toString();
+  const res = await fetch(GAS_URL + '?' + qs);
+  return res.json();
+}
+
+// ============================================================
+//  ポーリング（3秒ごと）
+// ============================================================
+function startPolling() {
+  if (polling) clearInterval(polling);
+  polling = setInterval(fetchState, 3000);
+}
+
+async function fetchState() {
+  const badge = document.getElementById('sync-badge');
+  badge.textContent = '同期中'; badge.className = 'sync-badge syncing';
+  try {
+    const data = await api({ action: 'getState' });
+    if (data.ok) {
+      state.eventName   = data.eventName;
+      state.checkpoints = data.checkpoints;
+      state.groups      = data.groups;
+      state.records     = data.records || {};
+      badge.textContent = '同期済'; badge.className = 'sync-badge';
+      renderAll();
+    }
+  } catch(e) {
+    badge.textContent = 'エラー'; badge.className = 'sync-badge error';
+  }
+}
+
+// ============================================================
+//  設定
+// ============================================================
+let tempCPs = [], tempGroups = [];
+
+function addCP() {
+  const v = document.getElementById('inp-cp').value.trim();
+  if (!v || tempCPs.includes(v)) return;
+  tempCPs.push(v);
+  document.getElementById('inp-cp').value = '';
+  renderTags();
+}
+
+function addGroup() {
+  const v = document.getElementById('inp-group').value.trim();
+  if (!v || tempGroups.includes(v)) return;
+  tempGroups.push(v);
+  document.getElementById('inp-group').value = '';
+  renderTags();
+}
+
+function bulkGroups() {
+  const n = parseInt(document.getElementById('inp-gcount').value);
+  if (!n) return;
+  for (let i = 1; i <= n; i++) {
+    const name = i + '班';
+    if (!tempGroups.includes(name)) tempGroups.push(name);
+  }
+  document.getElementById('inp-gcount').value = '';
+  renderTags();
+}
+
+function renderTags() {
+  document.getElementById('cp-tags').innerHTML =
+    tempCPs.map((cp, i) =>
+      `<span class="tag">${cp}<button class="tag-del" onclick="tempCPs.splice(${i},1);renderTags()">×</button></span>`
+    ).join('') || '<span style="font-size:12px;color:#9ca3af">なし</span>';
+
+  document.getElementById('group-tags').innerHTML =
+    tempGroups.map((g, i) =>
+      `<span class="tag">${g}<button class="tag-del" onclick="tempGroups.splice(${i},1);renderTags()">×</button></span>`
+    ).join('') || '<span style="font-size:12px;color:#9ca3af">なし</span>';
+}
+
+async function saveConfig() {
+  const eName = document.getElementById('inp-event').value.trim();
+  const msg = document.getElementById('setup-msg');
+  if (!eName) { msg.textContent = '行事名を入力してください'; return; }
+  if (!tempCPs.length) { msg.textContent = 'CPを1つ以上追加してください'; return; }
+  if (!tempGroups.length) { msg.textContent = '班を1つ以上追加してください'; return; }
+
+  msg.textContent = '保存中...';
+  try {
+    const res = await api({
+      action: 'saveConfig',
+      eventName: eName,
+      checkpoints: JSON.stringify(tempCPs),
+      groups: JSON.stringify(tempGroups)
+    });
+    if (res.ok) {
+      msg.textContent = '✅ 保存しました';
+      await fetchState();
+      showTab('checkin');
+      document.querySelector('.tab').classList.remove('active');
+      document.querySelectorAll('.tab')[1].classList.add('active');
+    }
+  } catch(e) {
+    msg.textContent = 'エラーが発生しました';
+  }
+}
+
+// ============================================================
+//  チェックイン（マトリクス表）
+// ============================================================
+function renderCheckin() {
+  const cps    = state.checkpoints;
+  const groups = state.groups;
+
+  // --- ヘッダー行: 班列 + CP列 ---
+  const hdr = document.getElementById('ci-header');
+  const cpCounts = cps.map(cp =>
+    groups.filter(g => state.records[g] && state.records[g][cp]).length
+  );
+  hdr.innerHTML =
+    `<th class="col-group">班</th>` +
+    cps.map((cp, i) => `
+      <th class="col-cp">
+        <div class="cp-th-name">${cp}</div>
+        <div class="cp-th-count">${cpCounts[i]}/${groups.length}班</div>
+      </th>`
+    ).join('');
+
+  // --- 本体行 ---
+  const tbody = document.getElementById('ci-body');
+  if (!groups.length || !cps.length) {
+    tbody.innerHTML = `<tr><td colspan="${cps.length+1}" class="empty" style="padding:2rem;text-align:center;color:#9ca3af">設定タブで班・CPを追加してください</td></tr>`;
+    document.getElementById('ci-progress').textContent = '';
+    return;
+  }
+
+  let totalPassed = 0, totalCells = groups.length * cps.length, allPassedGroups = 0;
+
+  tbody.innerHTML = groups.map(g => {
+    const allPassed = cps.every(cp => state.records[g] && state.records[g][cp]);
+    if (allPassed) allPassedGroups++;
+
+    const cells = cps.map(cp => {
+      const passed = state.records[g] && state.records[g][cp];
+      if (passed) totalPassed++;
+      const time = passed ? state.records[g][cp] : '';
+      return `<td class="tile-cell">
+        <div class="tile${passed?' passed':''}" onclick="toggleCell('${esc(g)}','${esc(cp)}')">
+          <div class="tile-icon">${passed ? '✅' : '　'}</div>
+          <div class="tile-time">${time}</div>
+        </div>
+      </td>`;
+    }).join('');
+
+    return `<tr class="${allPassed?'all-passed':''}">
+      <td class="col-group">${allPassed?'✓ ':''}${g}</td>
+      ${cells}
+    </tr>`;
+  }).join('');
+
+  const pct = totalCells > 0 ? Math.round(totalPassed / totalCells * 100) : 0;
+  document.getElementById('ci-progress').textContent =
+    `${totalPassed}/${totalCells} 通過（${pct}%）`;
+}
+
+async function toggleCell(g, cp) {
+  // 楽観的更新
+  if (!state.records[g]) state.records[g] = {};
+  if (state.records[g][cp]) {
+    delete state.records[g][cp];
+  } else {
+    const now = new Date().toLocaleTimeString('ja-JP', { hour:'2-digit', minute:'2-digit' });
+    state.records[g][cp] = now;
+  }
+  renderCheckin();
+  renderOverview();
+  // サーバーに送信
+  await api({ action: 'toggle', group: g, cp: cp });
+}
+
+// ============================================================
+//  一覧
+// ============================================================
+function renderOverview() {
+  const cps    = state.checkpoints;
+  const groups = state.groups;
+
+  // ヘッダー
+  const hdr = document.getElementById('ov-header');
+  hdr.innerHTML = `<th>班</th>` + cps.map(cp => `<th>${cp}</th>`).join('');
+
+  let total = 0, ok = 0, ng = 0;
+  const rows = groups.map(g => {
+    const allOk = cps.length > 0 && cps.every(cp => state.records[g] && state.records[g][cp]);
+    if (allOk) ok++; else ng++;
+    cps.forEach(cp => { if (state.records[g] && state.records[g][cp]) total++; });
+    return { g, allOk };
+  });
+
+  document.getElementById('m-total').textContent = total;
+  document.getElementById('m-ok').textContent    = ok;
+  document.getElementById('m-ng').textContent    = ng;
+
+  const f = state.filter;
+  const filtered = rows.filter(r => {
+    if (f === 'ok') return r.allOk;
+    if (f === 'ng') return !r.allOk && cps.length > 0;
+    return true;
+  });
+
+  const tbody = document.getElementById('ov-body');
+  if (!groups.length || !cps.length) {
+    tbody.innerHTML = `<tr><td colspan="${cps.length+1}" class="empty">設定から班・CPを追加してください</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map(({ g, allOk }) => {
+    const cells = cps.map(cp => {
+      const passed = state.records[g] && state.records[g][cp];
+      return `<td>${passed
+        ? `<span class="pass">✓ ${state.records[g][cp]}</span>`
+        : `<span class="fail">✗</span>`}</td>`;
+    }).join('');
+    return `<tr>
+      <td style="font-weight:${allOk?'600':'400'};white-space:nowrap">
+        <span class="dot ${allOk?'ok':'ng'}"></span>${g}
+      </td>${cells}
+    </tr>`;
+  }).join('');
+}
+
+function setFilter(f) {
+  state.filter = f;
+  ['all','ok','ng'].forEach(k => document.getElementById('f-'+k).classList.toggle('active', k===f));
+  renderOverview();
+}
+
+function copyText() {
+  const cps = state.checkpoints, groups = state.groups;
+  let t = (state.eventName || '通過記録') + '\n' + new Date().toLocaleString('ja-JP') + '\n\n';
+  t += '班\t' + cps.join('\t') + '\n';
+  groups.forEach(g => {
+    t += g + '\t' + cps.map(cp => state.records[g] && state.records[g][cp] ? '○ '+state.records[g][cp] : '✗').join('\t') + '\n';
+  });
+  navigator.clipboard.writeText(t).then(() => alert('コピーしました')).catch(() => prompt('コピー:', t));
+}
+
+async function confirmReset() {
+  if (!confirm('通過記録をすべてリセットしますか？')) return;
+  await api({ action: 'reset' });
+  await fetchState();
+}
+
+// ============================================================
+//  ユーティリティ
+// ============================================================
+function esc(s) { return s.replace(/'/g, "\\'"); }
+
+function renderAll() {
+  // 設定タブの同期
+  tempCPs     = [...state.checkpoints];
+  tempGroups  = [...state.groups];
+  document.getElementById('inp-event').value = state.eventName;
+  renderTags();
+
+  document.getElementById('hdr-event').textContent = state.eventName || '（未設定）';
+  renderCheckin();
+  renderOverview();
+}
+
+// ============================================================
+//  起動
+// ============================================================
+fetchState().then(() => startPolling());
+</script>
+</body>
+</html>
