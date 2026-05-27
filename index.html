@@ -164,7 +164,7 @@ tr:last-child td{border-bottom:none}
     <div class="tag-list" id="c-grp-tags"></div>
   </div>
 
-  <button class="btn-create" id="btn-create" onclick="createEvent()">
+  <button class="btn-create" id="btn-create" onclick="createNewEvent()">
     🚀 イベントを作成してURLを発行
   </button>
   <div class="top-msg" id="top-msg"></div>
@@ -343,7 +343,7 @@ function renderCTags(){
 }
 
 // ===== イベント作成（一発） =====
-async function createEvent(){
+async function createNewEvent(){
   const name=document.getElementById('c-ename').value.trim();
   const msg=document.getElementById('top-msg');
   if(!name)           { msg.textContent='行事名を入力してください'; return; }
