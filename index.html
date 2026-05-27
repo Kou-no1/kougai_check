@@ -286,7 +286,7 @@ tr:last-child td{border-bottom:none}
 
 <script>
 // ★ GAS WebアプリURL
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyd4lvmYAY2XBQ3VCqevK81F4IRk4Zjpx-H1jOwYcVWKLT6BgaARpMPdBYlbhGmC-aP/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxl-QYmj5BWosR7a7pc8GnoVjYuDKO-Qw_1N1ni7HQlP1MuXAikhDWmP7CpLqfX79O9/exec';
 
 // ===== 状態 =====
 let S = { eventId:'', eventName:'', checkpoints:[], groups:[], records:{}, filter:'all' };
@@ -516,10 +516,12 @@ async function toggleCell(g,cp){
     ? `「${g}」の「${cp}」\n通過記録を取り消しますか？`
     : `「${g}」が「${cp}」を通過しました？`;
   if(!confirm(msg)) return;
+  const newTime = already ? null : new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
   if(already){ delete S.records[g][cp]; }
-  else{ S.records[g][cp]=new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}); }
+  else{ S.records[g][cp]=newTime; }
   renderCheckin(); renderOverview();
-  await api({ action:'toggle', eventId:S.eventId, group:g, cp:cp });
+  // remove=取消 / add=通過記録 を明示して送る（冪等）
+  await api({ action:'toggle', eventId:S.eventId, group:g, cp:cp, op: already?'remove':'add' });
 }
 
 // ===== 一覧 =====
@@ -587,9 +589,6 @@ function renderAll(){
 
 function esc(s){ return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 </script>
-    <footer style="border-top: 0.5px solid #e0e0e0; padding: 1.5rem 0 1rem; text-align: center;">
-    <p style="font-size: 15px; color: #888; margin: 0 0 4px;">「あったらいいのに」を、作ってきた。</p>
-    <p style="font-size: 12px; color: #aaa; margin: 0;">© 2026 野村晃一 All rights reserved.</p>
-  </footer>
 </body>
+  <footer style="border-top: 0.5px solid #e0e0e0; padding: 1.5rem 0 1rem; text-align: center;"> <p style="font-size: 15px; color: #888; margin: 0 0 4px;">「あったらいいのに」を、作ってきた。</p> <p style="font-size: 12px; color: #aaa; margin: 0;">© 2026 野村晃一 All rights reserved.</p> </footer> 
 </html>
