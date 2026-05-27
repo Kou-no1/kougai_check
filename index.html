@@ -5,42 +5,60 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CP通過管理</title>
 <style>
-/* ===== BASE ===== */
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#f4f5f7;color:#1a1a1a;font-size:15px;min-height:100vh}
 button{font-family:inherit;cursor:pointer}
 
-/* ===== TOP PAGE ===== */
-.top-page{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px}
-.top-logo{font-size:40px;margin-bottom:8px}
-.top-title{font-size:22px;font-weight:700;margin-bottom:4px}
-.top-sub{font-size:13px;color:#6b7280;margin-bottom:32px}
-.top-card{background:#fff;border-radius:16px;padding:24px;width:100%;max-width:400px;border:1px solid #e5e7eb;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.top-card-title{font-size:13px;font-weight:600;color:#374151;margin-bottom:12px;display:flex;align-items:center;gap:6px}
-.top-card input{width:100%;border:1px solid #d1d5db;border-radius:10px;padding:11px 14px;font-size:15px;outline:none;margin-bottom:10px}
-.top-card input:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.12)}
-.btn-create{width:100%;padding:13px;border-radius:10px;border:none;background:#111;color:#fff;font-size:15px;font-weight:600}
-.btn-join{width:100%;padding:13px;border-radius:10px;border:2px solid #111;background:#fff;color:#111;font-size:15px;font-weight:600}
-.top-msg{font-size:13px;text-align:center;min-height:20px;color:#dc2626}
+/* ===== TOP ===== */
+.top{display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:28px 16px 40px;background:#f4f5f7}
+.top-logo{font-size:42px;margin-bottom:8px;margin-top:8px}
+.top-title{font-size:22px;font-weight:700;margin-bottom:3px}
+.top-sub{font-size:13px;color:#6b7280;margin-bottom:28px;text-align:center;line-height:1.6}
+.top-card{background:#fff;border-radius:16px;padding:22px 20px;width:100%;max-width:440px;border:1px solid #e5e7eb;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.tc-title{font-size:13px;font-weight:700;color:#374151;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.field-label{font-size:12px;color:#6b7280;font-weight:500;margin-bottom:5px;margin-top:12px}
+.field-label:first-of-type{margin-top:0}
+input[type=text],input[type=number]{width:100%;border:1px solid #d1d5db;border-radius:9px;padding:10px 13px;font-size:14px;outline:none;background:#fff}
+input:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+.add-row{display:flex;gap:8px;margin-bottom:0}
+.add-row input{flex:1}
+.btn-add{border:1px solid #d1d5db;border-radius:9px;padding:9px 14px;font-size:13px;background:#fff;color:#374151;white-space:nowrap}
+.bulk-row{display:flex;gap:8px;margin-top:8px}
+.bulk-row input{width:80px;flex:none}
+.tag-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;min-height:28px}
+.tag{display:inline-flex;align-items:center;gap:3px;font-size:12px;padding:4px 10px;border-radius:999px;background:#f3f4f6;color:#374151;border:1px solid #e5e7eb}
+.tag-x{background:none;border:none;cursor:pointer;color:#9ca3af;font-size:15px;line-height:1;padding:0 2px}
+.btn-create{width:100%;max-width:440px;padding:14px;border-radius:12px;border:none;background:#111;color:#fff;font-size:16px;font-weight:700;margin-top:4px}
+.btn-create:disabled{background:#9ca3af}
+.top-msg{font-size:13px;text-align:center;color:#dc2626;margin-top:8px;min-height:20px}
 
-/* ===== CREATED MODAL ===== */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;padding:20px}
+.divider{width:100%;max-width:440px;display:flex;align-items:center;gap:10px;margin:4px 0 4px;color:#9ca3af;font-size:12px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:#e5e7eb}
+
+.join-card{background:#fff;border-radius:16px;padding:18px 20px;width:100%;max-width:440px;border:1px solid #e5e7eb;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.join-row{display:flex;gap:8px;margin-top:10px}
+.join-row input{flex:1}
+.btn-join{border:2px solid #111;border-radius:9px;padding:9px 16px;font-size:13px;font-weight:600;background:#fff;color:#111;white-space:nowrap}
+
+/* ===== MODAL ===== */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.show{display:flex}
 .modal{background:#fff;border-radius:20px;padding:28px 24px;width:100%;max-width:400px}
 .modal-title{font-size:18px;font-weight:700;margin-bottom:6px}
-.modal-sub{font-size:13px;color:#6b7280;margin-bottom:20px}
-.url-box{background:#f3f4f6;border-radius:10px;padding:12px 14px;font-size:13px;word-break:break-all;color:#374151;margin-bottom:12px;border:1px solid #e5e7eb}
-.btn-copy{width:100%;padding:12px;border-radius:10px;border:1px solid #d1d5db;background:#fff;font-size:14px;margin-bottom:10px}
-.btn-go{width:100%;padding:13px;border-radius:10px;border:none;background:#111;color:#fff;font-size:15px;font-weight:600}
+.modal-sub{font-size:13px;color:#6b7280;margin-bottom:18px;line-height:1.6}
+.url-box{background:#f3f4f6;border-radius:10px;padding:12px 14px;font-size:12px;word-break:break-all;color:#374151;margin-bottom:12px;border:1px solid #e5e7eb;font-family:monospace;line-height:1.5}
+.btn-copy{width:100%;padding:12px;border-radius:10px;border:1px solid #d1d5db;background:#fff;font-size:14px;margin-bottom:10px;cursor:pointer}
+.btn-go{width:100%;padding:13px;border-radius:10px;border:none;background:#111;color:#fff;font-size:15px;font-weight:700;cursor:pointer}
 
-/* ===== APP SHELL ===== */
+/* ===== APP ===== */
 .app{display:none;flex-direction:column;min-height:100vh}
 .app.show{display:flex}
-.app-header{background:#fff;border-bottom:1px solid #e5e7eb;padding:11px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
-.app-header-title{font-size:15px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.app-header-id{font-size:10px;color:#9ca3af;font-family:monospace}
+.app-hdr{background:#fff;border-bottom:1px solid #e5e7eb;padding:11px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+.app-hdr-main{flex:1;overflow:hidden}
+.app-hdr-title{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app-hdr-id{font-size:10px;color:#9ca3af;font-family:monospace;margin-top:1px}
 .sync{font-size:11px;padding:3px 9px;border-radius:999px;background:#dcfce7;color:#166534;white-space:nowrap}
-.sync.syncing{background:#fef9c3;color:#854d0e}
+.sync.ing{background:#fef9c3;color:#854d0e}
 .sync.err{background:#fee2e2;color:#991b1b}
 
 .tabs{display:flex;background:#fff;border-bottom:1px solid #e5e7eb}
@@ -50,68 +68,44 @@ button{font-family:inherit;cursor:pointer}
 .page{display:none;padding:16px;flex:1}
 .page.active{display:block}
 
-/* ===== SETUP ===== */
+/* ===== SETTINGS TAB ===== */
 .card{background:#fff;border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid #e5e7eb}
 .card-label{font-size:12px;color:#6b7280;margin-bottom:8px;font-weight:500}
 .row{display:flex;gap:8px}
-input[type=text],input[type=number]{border:1px solid #d1d5db;border-radius:9px;padding:10px 13px;font-size:14px;outline:none;width:100%}
-input:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
 .btn{display:inline-flex;align-items:center;gap:5px;border:1px solid #d1d5db;border-radius:9px;padding:9px 15px;font-size:13px;background:#fff;color:#374151;white-space:nowrap}
 .btn-primary{background:#111;color:#fff;border-color:#111;font-weight:600}
 .btn-danger{border-color:#fca5a5;color:#dc2626}
-.tag-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.tag{display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:4px 10px;border-radius:999px;background:#f3f4f6;color:#374151;border:1px solid #e5e7eb}
-.tag-x{background:none;border:none;cursor:pointer;color:#9ca3af;font-size:16px;line-height:1;padding:0 2px}
-.save-btn{width:100%;padding:13px;border-radius:12px;border:none;background:#111;color:#fff;font-size:15px;font-weight:600;margin-top:4px}
+.save-btn{width:100%;padding:13px;border-radius:12px;border:none;background:#111;color:#fff;font-size:15px;font-weight:600;margin-top:4px;cursor:pointer}
 .setup-msg{font-size:13px;color:#6b7280;text-align:center;margin-top:10px;min-height:18px}
-
-/* ===== SHARE BAR ===== */
 .share-bar{background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
-.share-bar-url{font-size:12px;color:#1d4ed8;word-break:break-all;flex:1;font-family:monospace}
-.btn-share{font-size:12px;padding:6px 12px;border-radius:8px;border:1px solid #3b82f6;background:#fff;color:#2563eb}
+.share-bar-url{font-size:11px;color:#1d4ed8;word-break:break-all;flex:1;font-family:monospace}
+.btn-share{font-size:12px;padding:7px 13px;border-radius:8px;border:1px solid #3b82f6;background:#fff;color:#2563eb;cursor:pointer;white-space:nowrap}
 
 /* ===== CHECKIN MATRIX ===== */
 .ci-page{display:none;flex-direction:column;flex:1}
 .ci-page.active{display:flex}
-.ci-bar{background:#fff;border-bottom:1px solid #e5e7eb;padding:9px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:#6b7280}
-.ci-bar-prog{margin-left:auto;font-weight:700;color:#111;font-size:13px}
+.ci-bar{background:#fff;border-bottom:1px solid #e5e7eb;padding:9px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px;color:#6b7280}
+.ci-prog{margin-left:auto;font-weight:700;color:#111;font-size:13px}
 .leg{display:flex;align-items:center;gap:4px}
 .leg-box{width:13px;height:13px;border-radius:3px;border:1.5px solid}
 .leg-ok{background:#f0fdf4;border-color:#86efac}
 .leg-ng{background:#f9fafb;border-color:#e5e7eb}
 .ci-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;flex:1}
 .ci-matrix{border-collapse:separate;border-spacing:0;min-width:100%}
-/* 固定班名列 */
-.ci-matrix .col-g{
-  position:sticky;left:0;z-index:3;background:#f9fafb;
-  min-width:76px;max-width:96px;padding:10px 10px;
-  font-size:13px;font-weight:600;
-  border-right:2px solid #d1d5db;border-bottom:1px solid #e5e7eb;
-  white-space:nowrap
-}
+.ci-matrix .col-g{position:sticky;left:0;z-index:3;background:#f9fafb;min-width:76px;max-width:96px;padding:10px;font-size:13px;font-weight:600;border-right:2px solid #d1d5db;border-bottom:1px solid #e5e7eb;white-space:nowrap}
 .ci-matrix thead .col-g{background:#f3f4f6;color:#6b7280;font-size:11px;font-weight:500;border-bottom:2px solid #d1d5db}
-/* CP列ヘッダー */
-.ci-matrix thead th.col-cp{
-  background:#f3f4f6;padding:8px 6px 6px;
-  font-size:11px;font-weight:500;color:#374151;
-  text-align:center;border-bottom:2px solid #d1d5db;
-  border-right:1px solid #e5e7eb;white-space:nowrap;min-width:82px
-}
+.ci-matrix thead th.col-cp{background:#f3f4f6;padding:8px 6px 6px;font-size:11px;font-weight:500;color:#374151;text-align:center;border-bottom:2px solid #d1d5db;border-right:1px solid #e5e7eb;white-space:nowrap;min-width:82px}
 .cp-th-name{font-size:12px;font-weight:700;color:#111}
 .cp-th-cnt{font-size:10px;color:#6b7280;margin-top:2px}
-/* タイルセル */
 .ci-matrix td.t-cell{padding:5px;border-right:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;vertical-align:middle;min-width:82px}
 .tile{display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:9px;padding:8px 4px;min-height:54px;cursor:pointer;border:1.5px solid #e5e7eb;background:#f9fafb;user-select:none;-webkit-tap-highlight-color:transparent;transition:transform .08s}
 .tile:active{transform:scale(.93)}
 .tile.ok{background:#f0fdf4;border-color:#86efac}
-.tile.ok .t-ico{color:#16a34a}
 .tile.ok .t-time{color:#16a34a}
 .t-ico{font-size:20px;line-height:1}
 .t-time{font-size:10px;color:#9ca3af;margin-top:3px;min-height:14px}
-/* 偶数行縞 */
 .ci-matrix tbody tr:nth-child(even) .col-g{background:#f0f0f0}
 .ci-matrix tbody tr:nth-child(even) td.t-cell{background:#fafafa}
-/* 全完了行 */
 .ci-matrix tbody tr.all-ok .col-g{color:#15803d}
 .ci-hint{padding:8px 16px 12px;font-size:11px;color:#9ca3af}
 
@@ -138,46 +132,75 @@ tr:last-child td{border-bottom:none}
 </head>
 <body>
 
-<!-- ========== TOP PAGE ========== -->
-<div id="top-page" class="top-page">
+<!-- ===== TOP PAGE ===== -->
+<div id="top-page" class="top">
   <div class="top-logo">📍</div>
   <div class="top-title">CP通過管理</div>
-  <div class="top-sub">林間学校・修学旅行・社会科見学向け</div>
+  <div class="top-sub">林間学校・修学旅行・社会科見学向け<br>チェックポイント通過リアルタイム共有</div>
 
+  <!-- 作成フォーム -->
   <div class="top-card">
-    <div class="top-card-title">✨ 新しいイベントを作成</div>
-    <input type="text" id="inp-ename" placeholder="行事名（例: 6年2組 修学旅行）" />
-    <button class="btn-create" onclick="createEvent()">イベントを作成</button>
+    <div class="tc-title">✨ 新しいイベントを作成</div>
+
+    <div class="field-label">行事名</div>
+    <input type="text" id="c-ename" placeholder="例: 6年2組 修学旅行 2日目">
+
+    <div class="field-label">チェックポイント</div>
+    <div class="add-row">
+      <input type="text" id="c-cp" placeholder="例: 第1関門（公園入口）" onkeydown="if(event.key==='Enter')cAddCP()">
+      <button class="btn-add" onclick="cAddCP()">追加</button>
+    </div>
+    <div class="tag-list" id="c-cp-tags"></div>
+
+    <div class="field-label">班</div>
+    <div class="add-row">
+      <input type="text" id="c-grp" placeholder="例: 1班" onkeydown="if(event.key==='Enter')cAddGrp()">
+      <button class="btn-add" onclick="cAddGrp()">追加</button>
+    </div>
+    <div class="bulk-row">
+      <input type="number" id="c-gn" placeholder="班の数" min="1" max="40">
+      <button class="btn-add" onclick="cBulkGrp()">まとめて追加</button>
+    </div>
+    <div class="tag-list" id="c-grp-tags"></div>
   </div>
 
-  <div class="top-card">
-    <div class="top-card-title">🔗 既存のイベントに参加</div>
-    <input type="text" id="inp-join-id" placeholder="イベントID（例: abc12345）" />
-    <button class="btn-join" onclick="joinEvent()">参加する</button>
-  </div>
-
+  <button class="btn-create" id="btn-create" onclick="createEvent()">
+    🚀 イベントを作成してURLを発行
+  </button>
   <div class="top-msg" id="top-msg"></div>
+
+  <div class="divider">または</div>
+
+  <!-- 参加フォーム -->
+  <div class="join-card">
+    <div class="tc-title" style="margin-bottom:4px">🔗 既存イベントに参加</div>
+    <div style="font-size:12px;color:#6b7280">URLを受け取った場合はそのまま開くだけでOK</div>
+    <div class="join-row">
+      <input type="text" id="j-id" placeholder="イベントID（例: abc12345）">
+      <button class="btn-join" onclick="joinById()">参加</button>
+    </div>
+  </div>
 </div>
 
-<!-- ========== 作成完了モーダル ========== -->
-<div class="modal-overlay" id="created-modal">
+<!-- ===== 作成完了モーダル ===== -->
+<div class="modal-overlay" id="modal">
   <div class="modal">
-    <div class="modal-title">🎉 イベント作成完了！</div>
-    <div class="modal-sub">下のURLを引率教員全員にLINEで送ってください</div>
+    <div class="modal-title">🎉 作成完了！</div>
+    <div class="modal-sub">下のURLを引率教員全員にLINEで送ってください。<br>開くだけで参加・チェックインできます。</div>
     <div class="url-box" id="modal-url"></div>
-    <button class="btn-copy" onclick="copyUrl()">📋 URLをコピー</button>
+    <button class="btn-copy" onclick="copyModalUrl()">📋 URLをコピー</button>
     <button class="btn-go" onclick="goToEvent()">このイベントを開く →</button>
   </div>
 </div>
 
-<!-- ========== APP ========== -->
+<!-- ===== APP ===== -->
 <div class="app" id="app">
-  <div class="app-header">
-    <div style="flex:1;overflow:hidden">
-      <div class="app-header-title" id="hdr-title">読み込み中...</div>
-      <div class="app-header-id" id="hdr-id"></div>
+  <div class="app-hdr">
+    <div class="app-hdr-main">
+      <div class="app-hdr-title" id="hdr-title">読み込み中...</div>
+      <div class="app-hdr-id" id="hdr-id"></div>
     </div>
-    <span class="sync syncing" id="sync-badge">同期中</span>
+    <span class="sync ing" id="sync-badge">同期中</span>
   </div>
 
   <div class="tabs">
@@ -186,16 +209,15 @@ tr:last-child td{border-bottom:none}
     <button class="tab" onclick="showTab('overview',this)">📋 一覧</button>
   </div>
 
-  <!-- 設定 -->
+  <!-- 設定タブ（事後編集用） -->
   <div class="page active" id="page-setup">
-    <div class="share-bar" id="share-bar">
-      <div>
+    <div class="share-bar">
+      <div style="flex:1;min-width:0">
         <div style="font-size:11px;color:#1d4ed8;font-weight:600;margin-bottom:3px">📎 招待URL</div>
         <div class="share-bar-url" id="share-url"></div>
       </div>
       <button class="btn-share" onclick="shareUrl()">共有</button>
     </div>
-
     <div class="card">
       <div class="card-label">行事名</div>
       <input type="text" id="inp-event" placeholder="例: 6年2組 修学旅行 2日目">
@@ -224,12 +246,12 @@ tr:last-child td{border-bottom:none}
     <div class="setup-msg" id="setup-msg"></div>
   </div>
 
-  <!-- チェックイン -->
+  <!-- チェックインタブ -->
   <div class="ci-page" id="page-checkin">
     <div class="ci-bar">
       <div class="leg"><div class="leg-box leg-ok"></div>通過済</div>
       <div class="leg"><div class="leg-box leg-ng"></div>未通過</div>
-      <div class="ci-bar-prog" id="ci-prog"></div>
+      <div class="ci-prog" id="ci-prog"></div>
     </div>
     <div class="ci-scroll">
       <table class="ci-matrix">
@@ -240,7 +262,7 @@ tr:last-child td{border-bottom:none}
     <div class="ci-hint">タイルをタップ → 通過記録。もう一度タップで取消</div>
   </div>
 
-  <!-- 一覧 -->
+  <!-- 一覧タブ -->
   <div class="page" id="page-overview">
     <div class="metrics">
       <div class="metric"><div class="m-label">総通過数</div><div class="m-val" id="m-tot">0</div></div>
@@ -249,14 +271,11 @@ tr:last-child td{border-bottom:none}
     </div>
     <div class="filter-row">
       <button class="fbtn active" id="f-all" onclick="setFilter('all')">全班</button>
-      <button class="fbtn" id="f-ok" onclick="setFilter('ok')">全完了</button>
-      <button class="fbtn" id="f-ng" onclick="setFilter('ng')">未通過あり</button>
+      <button class="fbtn" id="f-ok"  onclick="setFilter('ok')">全完了</button>
+      <button class="fbtn" id="f-ng"  onclick="setFilter('ng')">未通過あり</button>
     </div>
     <div class="ov-wrap">
-      <table>
-        <thead><tr id="ov-hdr"></tr></thead>
-        <tbody id="ov-body"></tbody>
-      </table>
+      <table><thead><tr id="ov-hdr"></tr></thead><tbody id="ov-body"></tbody></table>
     </div>
     <div class="ov-actions">
       <button class="btn" onclick="copyText()" style="font-size:12px">📋 テキストコピー</button>
@@ -266,321 +285,299 @@ tr:last-child td{border-bottom:none}
 </div>
 
 <script>
-// ============================================================
-//  GAS URL（デプロイ後に自動差し替え）
-// ============================================================
-const GAS_URL = '<?= ScriptApp.getService().getUrl() ?>';
+// ★ GAS WebアプリURL
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbz_UeNKDAacbWveoyt_oUf4ipB4h_SkALFeW2jyj75Ke_4_Q3EcOJ0ElYcdivsJippI/exec';
 
-// ============================================================
-//  状態
-// ============================================================
+// ===== 状態 =====
 let S = { eventId:'', eventName:'', checkpoints:[], groups:[], records:{}, filter:'all' };
-let tempCPs=[], tempGroups=[];
-let pollTimer=null;
-let createdUrl='';
+let tCPs=[], tGrps=[];       // 設定タブ用の一時リスト
+let cCPs=[], cGrps=[];       // 作成フォーム用の一時リスト
+let pollTimer=null, createdUrl='';
 
-// ============================================================
-//  起動：URLパラメータ確認
-// ============================================================
+// ===== JSONP =====
+let _ci=0;
+function api(params){
+  return new Promise((resolve,reject)=>{
+    const cb='__gcb'+(++_ci);
+    const tid=setTimeout(()=>{ delete window[cb]; reject(new Error('timeout')); },15000);
+    window[cb]=(d)=>{ clearTimeout(tid); delete window[cb]; document.getElementById(cb)?.remove(); resolve(d); };
+    const qs=new URLSearchParams({...params,callback:cb}).toString();
+    const s=document.createElement('script');
+    s.id=cb; s.src=GAS_URL+'?'+qs;
+    s.onerror=()=>{ clearTimeout(tid); delete window[cb]; s.remove(); reject(new Error('network error')); };
+    document.head.appendChild(s);
+  });
+}
+
+// ===== 起動 =====
 (function init(){
-  const params = new URLSearchParams(location.search);
-  const eid    = params.get('event');
-  if (eid) {
-    enterApp(eid);
-  } else {
-    document.getElementById('top-page').style.display = 'flex';
-  }
+  const eid=new URLSearchParams(location.search).get('event');
+  if(eid){ enterApp(eid); }
+  else   { document.getElementById('top-page').style.display='flex'; }
 })();
 
-// ============================================================
-//  TOP: イベント作成
-// ============================================================
-async function createEvent() {
-  const name = document.getElementById('inp-ename').value.trim();
-  const msg  = document.getElementById('top-msg');
-  if (!name) { msg.textContent = '行事名を入力してください'; return; }
-  msg.textContent = '作成中...';
+// ===== 作成フォーム：CP =====
+function cAddCP(){
+  const v=document.getElementById('c-cp').value.trim();
+  if(!v||cCPs.includes(v)) return;
+  cCPs.push(v); document.getElementById('c-cp').value=''; renderCTags();
+}
+function cAddGrp(){
+  const v=document.getElementById('c-grp').value.trim();
+  if(!v||cGrps.includes(v)) return;
+  cGrps.push(v); document.getElementById('c-grp').value=''; renderCTags();
+}
+function cBulkGrp(){
+  const n=parseInt(document.getElementById('c-gn').value);
+  if(!n) return;
+  for(let i=1;i<=n;i++){ const nm=i+'班'; if(!cGrps.includes(nm)) cGrps.push(nm); }
+  document.getElementById('c-gn').value=''; renderCTags();
+}
+function renderCTags(){
+  document.getElementById('c-cp-tags').innerHTML=
+    cCPs.map((v,i)=>`<span class="tag">${v}<button class="tag-x" onclick="cCPs.splice(${i},1);renderCTags()">×</button></span>`).join('')
+    ||'<span style="font-size:12px;color:#9ca3af">なし</span>';
+  document.getElementById('c-grp-tags').innerHTML=
+    cGrps.map((v,i)=>`<span class="tag">${v}<button class="tag-x" onclick="cGrps.splice(${i},1);renderCTags()">×</button></span>`).join('')
+    ||'<span style="font-size:12px;color:#9ca3af">なし</span>';
+}
+
+// ===== イベント作成（一発） =====
+async function createEvent(){
+  const name=document.getElementById('c-ename').value.trim();
+  const msg=document.getElementById('top-msg');
+  if(!name)           { msg.textContent='行事名を入力してください'; return; }
+  if(!cCPs.length)    { msg.textContent='CPを1つ以上追加してください'; return; }
+  if(!cGrps.length)   { msg.textContent='班を1つ以上追加してください'; return; }
+
+  const btn=document.getElementById('btn-create');
+  btn.disabled=true; btn.textContent='作成中...'; msg.textContent='';
+
   try {
-    const res = await api({ action:'createEvent', eventName: name });
-    if (!res.ok) throw new Error(res.error);
-    const url = GAS_URL + '?event=' + res.eventId;
-    createdUrl = url;
-    document.getElementById('modal-url').textContent = url;
-    document.getElementById('created-modal').classList.add('show');
-    S.eventId = res.eventId;
-    msg.textContent = '';
+    // 1. イベント作成
+    const res=await api({ action:'createEvent', eventName:name });
+    if(!res.ok) throw new Error(res.error);
+
+    // 2. CP・班を即保存
+    const r2=await api({
+      action:'saveConfig', eventId:res.eventId,
+      eventName:name,
+      checkpoints:JSON.stringify(cCPs),
+      groups:JSON.stringify(cGrps)
+    });
+    if(!r2.ok) throw new Error(r2.error);
+
+    S.eventId=res.eventId;
+    createdUrl=location.origin+location.pathname+'?event='+res.eventId;
+    document.getElementById('modal-url').textContent=createdUrl;
+    document.getElementById('modal').classList.add('show');
   } catch(e) {
-    msg.textContent = 'エラー: ' + e.message;
+    msg.textContent='エラー: '+e.message;
+  } finally {
+    btn.disabled=false; btn.textContent='🚀 イベントを作成してURLを発行';
   }
 }
 
-function copyUrl() {
+function copyModalUrl(){
   navigator.clipboard.writeText(createdUrl)
     .then(()=>alert('URLをコピーしました！LINEなどで共有してください'))
-    .catch(()=>prompt('コピーしてください:', createdUrl));
+    .catch(()=>prompt('コピーしてください:',createdUrl));
 }
-
-function goToEvent() {
-  document.getElementById('created-modal').classList.remove('show');
+function goToEvent(){
+  document.getElementById('modal').classList.remove('show');
   enterApp(S.eventId);
 }
 
-// ============================================================
-//  TOP: 既存イベントに参加
-// ============================================================
-async function joinEvent() {
-  const eid = document.getElementById('inp-join-id').value.trim();
-  const msg = document.getElementById('top-msg');
-  if (!eid) { msg.textContent = 'イベントIDを入力してください'; return; }
-  msg.textContent = '確認中...';
-  try {
-    const res = await api({ action:'getState', eventId: eid });
-    if (!res.ok) { msg.textContent = 'イベントが見つかりません'; return; }
+// ===== 参加 =====
+async function joinById(){
+  const eid=document.getElementById('j-id').value.trim();
+  const msg=document.getElementById('top-msg');
+  if(!eid){ msg.textContent='イベントIDを入力してください'; return; }
+  msg.textContent='確認中...';
+  try{
+    const r=await api({ action:'getState', eventId:eid });
+    if(!r.ok){ msg.textContent='イベントが見つかりません'; return; }
     enterApp(eid);
-  } catch(e) {
-    msg.textContent = 'エラーが発生しました';
-  }
+  }catch(e){ msg.textContent='エラーが発生しました'; }
 }
 
-// ============================================================
-//  アプリ画面へ遷移
-// ============================================================
-function enterApp(eid) {
-  S.eventId = eid;
-  document.getElementById('top-page').style.display = 'none';
+// ===== アプリ画面へ =====
+function enterApp(eid){
+  S.eventId=eid;
+  document.getElementById('top-page').style.display='none';
   document.getElementById('app').classList.add('show');
-  document.getElementById('hdr-id').textContent = 'ID: ' + eid;
-  // 招待URL表示
-  const inviteUrl = GAS_URL + '?event=' + eid;
-  document.getElementById('share-url').textContent = inviteUrl;
-  // URLをhistoryに反映
-  history.replaceState({}, '', '?event=' + eid);
-  fetchState().then(() => startPolling());
+  document.getElementById('hdr-id').textContent='ID: '+eid;
+  const inv=location.origin+location.pathname+'?event='+eid;
+  document.getElementById('share-url').textContent=inv;
+  history.replaceState({},'','?event='+eid);
+  fetchState().then(()=>startPolling());
 }
 
-// ============================================================
-//  タブ切替
-// ============================================================
-function showTab(name, btn) {
-  document.querySelectorAll('.page, .ci-page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
+// ===== タブ =====
+function showTab(name,btn){
+  document.querySelectorAll('.page,.ci-page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
   btn.classList.add('active');
-  if (name==='overview') renderOverview();
-  if (name==='checkin')  renderCheckin();
+  if(name==='overview') renderOverview();
+  if(name==='checkin')  renderCheckin();
 }
 
-// ============================================================
-//  API
-// ============================================================
-async function api(params) {
-  const qs  = new URLSearchParams(params).toString();
-  const res = await fetch(GAS_URL + '?' + qs);
-  return res.json();
+// ===== ポーリング（5秒） =====
+function startPolling(){
+  if(pollTimer) clearInterval(pollTimer);
+  pollTimer=setInterval(fetchState,5000);
 }
-
-// ============================================================
-//  ポーリング（4秒）
-// ============================================================
-function startPolling() {
-  if (pollTimer) clearInterval(pollTimer);
-  pollTimer = setInterval(fetchState, 4000);
-}
-
-async function fetchState() {
-  const badge = document.getElementById('sync-badge');
-  badge.textContent = '同期中'; badge.className = 'sync syncing';
-  try {
-    const d = await api({ action:'getState', eventId: S.eventId });
-    if (d.ok) {
-      S.eventName   = d.eventName;
-      S.checkpoints = d.checkpoints;
-      S.groups      = d.groups;
-      S.records     = d.records || {};
-      badge.textContent = '同期済'; badge.className = 'sync';
+async function fetchState(){
+  const b=document.getElementById('sync-badge');
+  b.textContent='同期中'; b.className='sync ing';
+  try{
+    const d=await api({ action:'getState', eventId:S.eventId });
+    if(d.ok){
+      S.eventName=d.eventName; S.checkpoints=d.checkpoints;
+      S.groups=d.groups; S.records=d.records||{};
+      b.textContent='同期済'; b.className='sync';
       renderAll();
     }
-  } catch(e) {
-    badge.textContent = 'エラー'; badge.className = 'sync err';
-  }
+  }catch(e){ b.textContent='エラー'; b.className='sync err'; }
 }
 
-// ============================================================
-//  設定タブ
-// ============================================================
-function addCP() {
-  const v = document.getElementById('inp-cp').value.trim();
-  if (!v || tempCPs.includes(v)) return;
-  tempCPs.push(v);
-  document.getElementById('inp-cp').value = '';
-  renderTags();
+// ===== 設定タブ（事後編集） =====
+function addCP(){
+  const v=document.getElementById('inp-cp').value.trim();
+  if(!v||tCPs.includes(v)) return;
+  tCPs.push(v); document.getElementById('inp-cp').value=''; renderTags();
 }
-function addGroup() {
-  const v = document.getElementById('inp-group').value.trim();
-  if (!v || tempGroups.includes(v)) return;
-  tempGroups.push(v);
-  document.getElementById('inp-group').value = '';
-  renderTags();
+function addGroup(){
+  const v=document.getElementById('inp-group').value.trim();
+  if(!v||tGrps.includes(v)) return;
+  tGrps.push(v); document.getElementById('inp-group').value=''; renderTags();
 }
-function bulkGroups() {
-  const n = parseInt(document.getElementById('inp-gn').value);
-  if (!n) return;
-  for (let i=1;i<=n;i++) { const name=i+'班'; if (!tempGroups.includes(name)) tempGroups.push(name); }
-  document.getElementById('inp-gn').value = '';
-  renderTags();
+function bulkGroups(){
+  const n=parseInt(document.getElementById('inp-gn').value);
+  if(!n) return;
+  for(let i=1;i<=n;i++){ const nm=i+'班'; if(!tGrps.includes(nm)) tGrps.push(nm); }
+  document.getElementById('inp-gn').value=''; renderTags();
 }
-function renderTags() {
-  document.getElementById('cp-tags').innerHTML =
-    tempCPs.map((v,i) => `<span class="tag">${v}<button class="tag-x" onclick="tempCPs.splice(${i},1);renderTags()">×</button></span>`).join('')
-    || '<span style="font-size:12px;color:#9ca3af">なし</span>';
-  document.getElementById('group-tags').innerHTML =
-    tempGroups.map((v,i) => `<span class="tag">${v}<button class="tag-x" onclick="tempGroups.splice(${i},1);renderTags()">×</button></span>`).join('')
-    || '<span style="font-size:12px;color:#9ca3af">なし</span>';
+function renderTags(){
+  document.getElementById('cp-tags').innerHTML=
+    tCPs.map((v,i)=>`<span class="tag">${v}<button class="tag-x" onclick="tCPs.splice(${i},1);renderTags()">×</button></span>`).join('')
+    ||'<span style="font-size:12px;color:#9ca3af">なし</span>';
+  document.getElementById('group-tags').innerHTML=
+    tGrps.map((v,i)=>`<span class="tag">${v}<button class="tag-x" onclick="tGrps.splice(${i},1);renderTags()">×</button></span>`).join('')
+    ||'<span style="font-size:12px;color:#9ca3af">なし</span>';
 }
-async function saveConfig() {
-  const name = document.getElementById('inp-event').value.trim();
-  const msg  = document.getElementById('setup-msg');
-  if (!name)            { msg.textContent='行事名を入力してください'; return; }
-  if (!tempCPs.length)  { msg.textContent='CPを1つ以上追加してください'; return; }
-  if (!tempGroups.length){ msg.textContent='班を1つ以上追加してください'; return; }
-  msg.textContent = '保存中...';
-  try {
-    const r = await api({ action:'saveConfig', eventId:S.eventId, eventName:name, checkpoints:JSON.stringify(tempCPs), groups:JSON.stringify(tempGroups) });
-    if (r.ok) { msg.textContent='✅ 保存しました'; await fetchState(); }
-    else      { msg.textContent='エラー: '+r.error; }
-  } catch(e) { msg.textContent='エラーが発生しました'; }
+async function saveConfig(){
+  const name=document.getElementById('inp-event').value.trim();
+  const msg=document.getElementById('setup-msg');
+  if(!name)           { msg.textContent='行事名を入力してください'; return; }
+  if(!tCPs.length)    { msg.textContent='CPを1つ以上追加してください'; return; }
+  if(!tGrps.length)   { msg.textContent='班を1つ以上追加してください'; return; }
+  msg.textContent='保存中...';
+  try{
+    const r=await api({ action:'saveConfig', eventId:S.eventId, eventName:name,
+      checkpoints:JSON.stringify(tCPs), groups:JSON.stringify(tGrps) });
+    if(r.ok){ msg.textContent='✅ 保存しました'; await fetchState(); }
+    else    { msg.textContent='エラー: '+r.error; }
+  }catch(e){ msg.textContent='エラーが発生しました'; }
 }
 
-// ============================================================
-//  チェックイン（マトリクス）
-// ============================================================
-function renderCheckin() {
-  const cps = S.checkpoints, groups = S.groups;
-
-  // ヘッダー
-  const hdr = document.getElementById('ci-hdr');
-  hdr.innerHTML = '<th class="col-g">班</th>' +
-    cps.map(cp => {
-      const cnt = groups.filter(g => S.records[g] && S.records[g][cp]).length;
-      return `<th class="col-cp"><div class="cp-th-name">${cp}</div><div class="cp-th-cnt">${cnt}/${groups.length}班</div></th>`;
+// ===== チェックイン =====
+function renderCheckin(){
+  const cps=S.checkpoints, gs=S.groups;
+  document.getElementById('ci-hdr').innerHTML='<th class="col-g">班</th>'+
+    cps.map(cp=>{
+      const cnt=gs.filter(g=>S.records[g]&&S.records[g][cp]).length;
+      return `<th class="col-cp"><div class="cp-th-name">${cp}</div><div class="cp-th-cnt">${cnt}/${gs.length}班</div></th>`;
     }).join('');
-
-  // ボディ
-  const tbody = document.getElementById('ci-body');
-  if (!groups.length || !cps.length) {
-    tbody.innerHTML = `<tr><td colspan="${cps.length+1}" class="empty-row">設定タブでCPと班を登録してください</td></tr>`;
-    document.getElementById('ci-prog').textContent = '';
-    return;
+  const tbody=document.getElementById('ci-body');
+  if(!gs.length||!cps.length){
+    tbody.innerHTML=`<tr><td colspan="${cps.length+1}" class="empty-row">設定から班・CPを登録してください</td></tr>`;
+    document.getElementById('ci-prog').textContent=''; return;
   }
-
-  let tot=0, total=groups.length*cps.length, allOkCnt=0;
-  tbody.innerHTML = groups.map(g => {
-    const allOk = cps.every(cp => S.records[g] && S.records[g][cp]);
-    if (allOk) allOkCnt++;
-    const cells = cps.map(cp => {
-      const passed = S.records[g] && S.records[g][cp];
-      if (passed) tot++;
-      return `<td class="t-cell"><div class="tile${passed?' ok':''}" onclick="toggleCell('${esc(g)}','${esc(cp)}')">
-        <div class="t-ico">${passed?'✅':'　'}</div>
-        <div class="t-time">${passed ? S.records[g][cp] : ''}</div>
+  let tot=0,total=gs.length*cps.length;
+  tbody.innerHTML=gs.map(g=>{
+    const allOk=cps.every(cp=>S.records[g]&&S.records[g][cp]);
+    const cells=cps.map(cp=>{
+      const p=S.records[g]&&S.records[g][cp]; if(p) tot++;
+      return `<td class="t-cell"><div class="tile${p?' ok':''}" onclick="toggleCell('${esc(g)}','${esc(cp)}')">
+        <div class="t-ico">${p?'✅':'　'}</div><div class="t-time">${p?S.records[g][cp]:''}</div>
       </div></td>`;
     }).join('');
     return `<tr class="${allOk?'all-ok':''}"><td class="col-g">${allOk?'✓ ':''}${g}</td>${cells}</tr>`;
   }).join('');
-
-  const pct = total > 0 ? Math.round(tot/total*100) : 0;
-  document.getElementById('ci-prog').textContent = `${tot}/${total} 通過（${pct}%）`;
+  const pct=total>0?Math.round(tot/total*100):0;
+  document.getElementById('ci-prog').textContent=`${tot}/${total} 通過（${pct}%）`;
 }
-
-async function toggleCell(g, cp) {
-  if (!S.records[g]) S.records[g] = {};
-  if (S.records[g][cp]) { delete S.records[g][cp]; }
-  else { S.records[g][cp] = new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}); }
+async function toggleCell(g,cp){
+  if(!S.records[g]) S.records[g]={};
+  if(S.records[g][cp]){ delete S.records[g][cp]; }
+  else{ S.records[g][cp]=new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}); }
   renderCheckin(); renderOverview();
   await api({ action:'toggle', eventId:S.eventId, group:g, cp:cp });
 }
 
-// ============================================================
-//  一覧
-// ============================================================
-function renderOverview() {
-  const cps=S.checkpoints, groups=S.groups;
-  document.getElementById('ov-hdr').innerHTML = '<th>班</th>' + cps.map(cp=>`<th>${cp}</th>`).join('');
-
-  let tot=0, okCnt=0, ngCnt=0;
-  const rows = groups.map(g => {
-    const allOk = cps.length>0 && cps.every(cp=>S.records[g]&&S.records[g][cp]);
-    allOk ? okCnt++ : ngCnt++;
+// ===== 一覧 =====
+function renderOverview(){
+  const cps=S.checkpoints, gs=S.groups;
+  document.getElementById('ov-hdr').innerHTML='<th>班</th>'+cps.map(cp=>`<th>${cp}</th>`).join('');
+  let tot=0,okCnt=0,ngCnt=0;
+  const rows=gs.map(g=>{
+    const allOk=cps.length>0&&cps.every(cp=>S.records[g]&&S.records[g][cp]);
+    allOk?okCnt++:ngCnt++;
     cps.forEach(cp=>{ if(S.records[g]&&S.records[g][cp]) tot++; });
-    return {g, allOk};
+    return {g,allOk};
   });
-  document.getElementById('m-tot').textContent = tot;
-  document.getElementById('m-ok').textContent  = okCnt;
-  document.getElementById('m-ng').textContent  = ngCnt;
-
-  const f = S.filter;
-  const filtered = rows.filter(r => f==='ok'?r.allOk : f==='ng'?!r.allOk&&cps.length>0 : true);
-  const tbody = document.getElementById('ov-body');
-  if (!groups.length||!cps.length) {
+  document.getElementById('m-tot').textContent=tot;
+  document.getElementById('m-ok').textContent=okCnt;
+  document.getElementById('m-ng').textContent=ngCnt;
+  const f=S.filter;
+  const filtered=rows.filter(r=>f==='ok'?r.allOk:f==='ng'?!r.allOk&&cps.length>0:true);
+  const tbody=document.getElementById('ov-body');
+  if(!gs.length||!cps.length){
     tbody.innerHTML=`<tr><td colspan="${cps.length+1}" class="empty-row">設定タブで班・CPを追加してください</td></tr>`; return;
   }
-  tbody.innerHTML = filtered.map(({g,allOk})=>{
-    const cells = cps.map(cp=>{
+  tbody.innerHTML=filtered.map(({g,allOk})=>{
+    const cells=cps.map(cp=>{
       const p=S.records[g]&&S.records[g][cp];
       return `<td>${p?`<span class="pass">✓ ${S.records[g][cp]}</span>`:`<span class="fail">✗</span>`}</td>`;
     }).join('');
     return `<tr><td style="font-weight:${allOk?700:400};white-space:nowrap"><span class="dot ${allOk?'ok2':'ng'}"></span>${g}</td>${cells}</tr>`;
   }).join('');
 }
-
-function setFilter(f) {
-  S.filter = f;
+function setFilter(f){
+  S.filter=f;
   ['all','ok','ng'].forEach(k=>document.getElementById('f-'+k).classList.toggle('active',k===f));
   renderOverview();
 }
-
-function copyText() {
-  const cps=S.checkpoints, groups=S.groups;
+function copyText(){
+  const cps=S.checkpoints,gs=S.groups;
   let t=(S.eventName||'通過記録')+'\n'+new Date().toLocaleString('ja-JP')+'\n\n';
-  t += '班\t'+cps.join('\t')+'\n';
-  groups.forEach(g=>{ t+=g+'\t'+cps.map(cp=>S.records[g]&&S.records[g][cp]?'○ '+S.records[g][cp]:'✗').join('\t')+'\n'; });
+  t+='班\t'+cps.join('\t')+'\n';
+  gs.forEach(g=>{ t+=g+'\t'+cps.map(cp=>S.records[g]&&S.records[g][cp]?'○ '+S.records[g][cp]:'✗').join('\t')+'\n'; });
   navigator.clipboard.writeText(t).then(()=>alert('コピーしました')).catch(()=>prompt('コピー:',t));
 }
-
-async function doReset() {
-  if (!confirm('通過記録をすべてリセットしますか？')) return;
+async function doReset(){
+  if(!confirm('通過記録をすべてリセットしますか？')) return;
   await api({ action:'reset', eventId:S.eventId });
   await fetchState();
 }
 
-// ============================================================
-//  共有ボタン
-// ============================================================
-function shareUrl() {
-  const url = GAS_URL + '?event=' + S.eventId;
-  if (navigator.share) {
-    navigator.share({ title: S.eventName||'CP通過管理', url });
-  } else {
-    navigator.clipboard.writeText(url).then(()=>alert('URLをコピーしました！'));
-  }
+// ===== 共有 =====
+function shareUrl(){
+  const url=location.origin+location.pathname+'?event='+S.eventId;
+  if(navigator.share){ navigator.share({ title:S.eventName||'CP通過管理', url }); }
+  else{ navigator.clipboard.writeText(url).then(()=>alert('URLをコピーしました！')); }
 }
 
-// ============================================================
-//  全体再描画
-// ============================================================
-function renderAll() {
-  document.getElementById('hdr-title').textContent = S.eventName || '（未設定）';
-  tempCPs    = [...S.checkpoints];
-  tempGroups = [...S.groups];
-  document.getElementById('inp-event').value = S.eventName;
-  renderTags();
-  renderCheckin();
-  renderOverview();
+// ===== 全体再描画 =====
+function renderAll(){
+  document.getElementById('hdr-title').textContent=S.eventName||'（未設定）';
+  tCPs=[...S.checkpoints]; tGrps=[...S.groups];
+  document.getElementById('inp-event').value=S.eventName;
+  renderTags(); renderCheckin(); renderOverview();
 }
 
-// ============================================================
-//  ユーティリティ
-// ============================================================
 function esc(s){ return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 </script>
 </body>
