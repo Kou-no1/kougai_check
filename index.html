@@ -579,7 +579,9 @@ function shareUrl(){
 function renderAll(){
   document.getElementById('hdr-title').textContent=S.eventName||'（未設定）';
   tCPs=[...S.checkpoints]; tGrps=[...S.groups];
-  document.getElementById('inp-event').value=S.eventName;
+  // フォーカス中は上書きしない
+  const evInp=document.getElementById('inp-event');
+  if(document.activeElement!==evInp) evInp.value=S.eventName;
   renderTags(); renderCheckin(); renderOverview();
 }
 
