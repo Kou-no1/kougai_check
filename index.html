@@ -415,10 +415,17 @@ function enterApp(eid){
 
 // ===== タブ =====
 function showTab(name,btn){
+  const leaving=document.querySelector('.tab.active')?.textContent||'';
   document.querySelectorAll('.page,.ci-page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   btn.classList.add('active');
+  // 設定タブから離れる時は最新状態を反映
+  if(leaving.includes('設定') && name!=='setup'){
+    tCPs=[...S.checkpoints]; tGrps=[...S.groups];
+    document.getElementById('inp-event').value=S.eventName;
+    renderTags();
+  }
   if(name==='overview') renderOverview();
   if(name==='checkin')  renderCheckin();
 }
@@ -591,11 +598,15 @@ function shareUrl(){
 // ===== 全体再描画 =====
 function renderAll(){
   document.getElementById('hdr-title').textContent=S.eventName||'（未設定）';
-  tCPs=[...S.checkpoints]; tGrps=[...S.groups];
-  // フォーカス中は上書きしない
-  const evInp=document.getElementById('inp-event');
-  if(document.activeElement!==evInp) evInp.value=S.eventName;
-  renderTags(); renderCheckin(); renderOverview();
+  // 設定タブが表示中は入力内容を上書きしない
+  const setupActive=document.getElementById('page-setup').classList.contains('active');
+  if(!setupActive){
+    tCPs=[...S.checkpoints]; tGrps=[...S.groups];
+    const evInp=document.getElementById('inp-event');
+    evInp.value=S.eventName;
+    renderTags();
+  }
+  renderCheckin(); renderOverview();
 }
 
 function esc(s){ return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
