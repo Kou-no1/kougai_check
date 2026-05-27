@@ -511,7 +511,12 @@ function renderCheckin(){
 }
 async function toggleCell(g,cp){
   if(!S.records[g]) S.records[g]={};
-  if(S.records[g][cp]){ delete S.records[g][cp]; }
+  const already=S.records[g][cp];
+  const msg=already
+    ? `「${g}」の「${cp}」\n通過記録を取り消しますか？`
+    : `「${g}」が「${cp}」を通過しました？`;
+  if(!confirm(msg)) return;
+  if(already){ delete S.records[g][cp]; }
   else{ S.records[g][cp]=new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}); }
   renderCheckin(); renderOverview();
   await api({ action:'toggle', eventId:S.eventId, group:g, cp:cp });
