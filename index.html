@@ -435,7 +435,18 @@ async function fetchState(){
     const d=await api({ action:'getState', eventId:S.eventId });
     if(d.ok){
       S.eventName=d.eventName; S.checkpoints=d.checkpoints;
-      S.groups=d.groups; S.records=d.records||{};
+      S.groups=d.groups;
+      // サーバー記録とローカル記録をマージ（直近タップ分の消失防止）
+      const srv=d.records||{};
+      const merged={};
+      Object.keys(srv).forEach(g=>{ merged[g]={...srv[g]}; });
+      Object.keys(S.records).forEach(g=>{
+        Object.keys(S.records[g]||{}).forEach(cp=>{
+          if(!merged[g]) merged[g]={};
+          if(!merged[g][cp]) merged[g][cp]=S.records[g][cp];
+        });
+      });
+      S.records=merged;
       b.textContent='同期済'; b.className='sync';
       renderAll();
     }
