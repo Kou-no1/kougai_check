@@ -1033,7 +1033,9 @@ async function checkConnection(invitedId) {
   el('retry-connection').disabled = true;
   el('top-msg').textContent = '接続先を確認中…';
   try {
-    const capability = hosted ? await hostedRequest({action:'capabilities'}) : await readApi({action:'capabilities', view:requestedView}, 9000);
+    const probe = {action:'capabilities'};
+    if (requestedView === 'guest') probe.view = 'guest';
+    const capability = hosted ? await hostedRequest(probe) : await readApi(probe, 9000);
     if (!hosted && requestedView !== 'guest' && !capability.ok && /unknown action|不明な(操作|アクション)/i.test(capability.error || '')) {
       const fallback = new URL('legacy.html', location.href);
       if (invitedId) fallback.searchParams.set('event', invitedId);

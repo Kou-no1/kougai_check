@@ -4,7 +4,8 @@ const CHAT_WINDOW = 100;
 
 function doGet(e) {
   const p = (e && e.parameter) || {};
-  if (!p.action || p.view === 'app') return hostedPage_(p);
+  const readAction = ['capabilities','getState','getReceipt'].includes(p.action);
+  if (!p.action || (p.view === 'app' && !readAction)) return hostedPage_(p);
   const cb = p.callback || '';
   if (cb && !/^[A-Za-z_$][0-9A-Za-z_$]{0,100}$/.test(cb)) {
     return output_({ok:false, error:'コールバック名が正しくありません'}, '');
