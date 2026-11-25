@@ -161,6 +161,9 @@ dialog#created-modal{margin:auto;padding:0;border:1px solid #d5e4df;border-radiu
 #created-modal::backdrop{background:rgba(0,0,0,.5)}
 #join-card label{display:block;margin-bottom:5px;font-size:13px}#inp-join-id{font-size:16px}
 #top-msg{max-width:520px}.legacy-help{display:block;color:#245b50;margin:8px 0 18px;text-align:center;font-size:13px}
+.access-card{border-color:#a7cabe;background:#f7fcfa}.access-card p,.access-card details{font-size:14px;line-height:1.65}
+#google-actions{margin:10px 0}.access-primary{display:inline-block;background:var(--field);color:#fff;text-decoration:none;padding:10px 20px;border-radius:9px;font-weight:650}.access-card a:not(.access-primary){display:block;margin:8px 0;color:#195649}.access-card .btn{margin-top:10px}.access-card summary{cursor:pointer}.access-card details p{margin-top:5px}
+#btn-create:disabled,.btn-join:disabled{opacity:.5}
 #page-checkin .ci-scroll{flex:0 1 auto}
 @media(min-width:800px){.app-header,.tabs,.ci-bar{padding-left:max(16px,calc((100vw - 1180px)/2));padding-right:max(16px,calc((100vw - 1180px)/2))}.ci-scroll,.ci-hint,#checkin-msg{width:100%;max-width:1200px;margin-inline:auto}}
 @media(max-width:400px){.tab{font-size:12px}.page{padding:12px}.metrics{gap:5px}.metric{padding:10px 8px}.app-header{padding:8px 10px}}
@@ -329,6 +332,18 @@ input:focus-visible, textarea:focus-visible {
   <div class="top-logo" aria-hidden="true">📍</div>
   <h1 class="top-title">チェックポイント通過管理</h1>
   <p class="top-sub">校外学習・修学旅行</p>
+  <section class="top-card access-card" id="access-help" aria-labelledby="access-title" hidden>
+    <h2 class="top-card-title" id="access-title">行事への接続を確認してください</h2>
+    <p id="access-reason" role="status"></p>
+    <div id="google-actions">
+      <a class="access-primary" id="open-on-google" target="_top" rel="noreferrer">Googleでアプリを開く</a>
+      <a id="google-create" target="_top" rel="noreferrer" hidden>新しい行事を作成する方はこちら</a>
+    </div>
+    <details id="access-steps"><summary>Googleでアプリが開かないとき</summary>
+      <p>学校のアカウントを選んでください。「unknown action」や文字だけが表示された場合は、管理者がGoogleログイン対応版のGASを既存のデプロイに反映する必要があります。</p>
+    </details>
+    <button class="btn" type="button" id="retry-connection">接続を再確認</button>
+  </section>
 <section class="top-card" id="create-card" aria-labelledby="create-title">
   <h2 class="top-card-title" id="create-title">新しいイベントを作成</h2>
   <label for="inp-ename">行事名</label>
@@ -369,7 +384,7 @@ input:focus-visible, textarea:focus-visible {
     <button class="btn-join" type="submit">参加する</button>
   </form>
   <div role="status" class="top-msg" id="top-msg"></div>
-  <a class="legacy-help" id="legacy-help" href="legacy.html" hidden>従来の通過管理を開く</a>
+
 </div>
 <dialog id="created-modal" aria-labelledby="created-title">
   <div class="modal">
@@ -547,6 +562,10 @@ input:focus-visible, textarea:focus-visible {
 <script>
 // このURLは、現在使用しているApps Scriptウェブアプリの /exec URL。
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwEHr5typEWu4A2nldXnV1VJMUMnCrwufTKAYPp3DM4rcy7SFChXD7xhWiddD4HRT4/exec';
+// Apps Script の HTML サービスが画面を返す場合だけ、この値が埋め込まれる。
+const hosted = window.KOUGAI_HOSTED || null;
+let connectionReady = false;
+let checkingConnection = false;
 const S = {eventId:'', eventName:'', checkpoints:[], groups:[], records:{}, messages:[], configVersion:null, filter:'all'};
 const el = id => document.getElementById(id);
 let createdUrl = '';
@@ -596,10 +615,36 @@ function readApi(params, timeout = 18000) {
   });
 }
 
+function googleAppUrl(eid = '') {
+  const url = new URL(hosted?.appUrl || GAS_URL);
+  url.search = '';
+  url.hash = '';
+  url.searchParams.set('view', 'app');
+  if (/^[a-z0-9]{8}$/.test(eid)) url.searchParams.set('event', eid);
+  return url.href;
+}
+
+function hostedRequest(params) {
+  return new Promise((resolve, reject) => {
+    if (!window.google?.script?.run) {
+      reject(new Error('Googleとの接続を開始できませんでした。ページを再読み込みしてください。'));
+      return;
+    }
+    const timer = setTimeout(() => reject(new Error('Googleからの応答がありません。同じ操作をもう一度お試しください。')), 45000);
+    google.script.run
+      .withSuccessHandler(result => { clearTimeout(timer); resolve(result); })
+      .withFailureHandler(() => {
+        clearTimeout(timer);
+        reject(new Error('Googleで処理を完了できませんでした。学校のアカウントで開いているか確認してください。'));
+      }).appRequest({...params, v:'4'});
+  });
+}
+
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function api(params) {
-  if (params.action === 'getState') return checked(await readApi(params));
+  if (params.action === 'getState') return checked(await (hosted ? hostedRequest(params) : readApi(params)));
   const requestId = params.requestId || makeId();
+  if (hosted) return checked(await hostedRequest({...params, requestId}));
   const deadline = Date.now() + 40000;
   const body = JSON.stringify({...params, v:'4', requestId});
   const post = async () => {
@@ -627,6 +672,7 @@ async function api(params) {
 }
 
 function inviteUrl(eid) {
+  if (hosted) return googleAppUrl(eid);
   const url = new URL(location.href);
   url.search = ''; url.hash = '';
   url.searchParams.set('event', eid);
@@ -648,12 +694,13 @@ async function shareUrl() {
 }
 
 function disableEntry(value) {
-  document.querySelectorAll('#top-page button').forEach(button => { button.disabled = value; });
+  el('btn-create').disabled = value || !connectionReady;
+  el('join-card').querySelector('button[type=submit]').disabled = value || !connectionReady;
 }
 async function createFieldEvent() {
   const name = el('inp-ename').value.trim();
   if (!name) { el('top-msg').textContent = '行事名を入力してください。'; return; }
-  if (joining) return;
+  if (joining || !connectionReady) return;
   joining = true; disableEntry(true);
   el('top-msg').textContent = '作成中…';
   try {
@@ -687,7 +734,7 @@ function applyState(data) {
 }
 
 async function enterApp(eid) {
-  if (joining) return;
+  if (joining || !connectionReady) return;
   if (!/^[a-z0-9]{8}$/.test(eid)) { el('top-msg').textContent = '8文字のイベントIDを入力してください。'; return; }
   joining = true; disableEntry(true);
   el('inp-join-id').value = eid;
@@ -697,7 +744,12 @@ async function enterApp(eid) {
     S.eventId = eid;
     applyState(data);
     if (!(await ensureParticipantName())) { el('top-msg').textContent = ''; return; }
-    history.replaceState({}, '', inviteUrl(eid));
+    if (hosted) {
+      // Googleの外枠に行事コードを反映する。iframe のURLは招待には使わない。
+      try { window.google.script.history?.replace({}, {view:'app', event:eid}, ''); } catch (_) {}
+    } else {
+      history.replaceState({}, '', inviteUrl(eid));
+    }
     el('top-page').style.display = 'none';
     el('app').classList.add('show');
     el('hdr-id').textContent = 'ID ' + eid;
@@ -873,25 +925,57 @@ async function boot() {
   window.addEventListener('online', pollNow);
   window.addEventListener('offline', () => { if (live) showSync(false); });
   document.addEventListener('visibilitychange', () => document.hidden ? clearTimeout(polling) : pollNow());
-  const eid = new URLSearchParams(location.search).get('event');
-  const fallback = new URL('legacy.html', location.href);
-  if (eid) fallback.searchParams.set('event', eid);
-  el('legacy-help').href = fallback.href;
+  const eid = hosted ? hosted.eventId : new URLSearchParams(location.search).get('event');
+  if (eid) el('inp-join-id').value = eid.trim().toLowerCase();
+  el('inp-join-id').addEventListener('input', updateRecoveryLink);
+  el('retry-connection').addEventListener('click', () => checkConnection(el('inp-join-id').value.trim().toLowerCase()));
+  updateRecoveryLink();
+  await checkConnection(eid || '');
+}
+
+function updateRecoveryLink() {
+  const id = el('inp-join-id').value.trim().toLowerCase();
+  el('open-on-google').href = googleAppUrl(id);
+  el('open-on-google').textContent = /^[a-z0-9]{8}$/.test(id) ? 'Googleでこの行事に参加' : 'Googleでアプリを開く';
+  el('google-create').href = googleAppUrl();
+  el('google-create').hidden = !/^[a-z0-9]{8}$/.test(id);
+}
+
+async function checkConnection(invitedId) {
+  if (checkingConnection || live) return;
+  checkingConnection = true;
+  connectionReady = false;
   disableEntry(true);
+  el('retry-connection').disabled = true;
   el('top-msg').textContent = '接続先を確認中…';
   try {
-    const capability = await readApi({action:'capabilities'});
-    if (!capability.ok && /unknown action|不明な(操作|アクション)/i.test(capability.error || '')) {
+    const capability = hosted ? await hostedRequest({action:'capabilities'}) : await readApi({action:'capabilities'}, 9000);
+    if (!hosted && !capability.ok && /unknown action|不明な(操作|アクション)/i.test(capability.error || '')) {
+      const fallback = new URL('legacy.html', location.href);
+      if (invitedId) fallback.searchParams.set('event', invitedId);
       location.replace(fallback.href);
       return;
     }
-    if (!capability.ok || capability.version !== 4) throw new Error('接続先のバージョンを確認できませんでした。');
+    checked(capability);
+    if (capability.version !== 4) throw new Error('GASの更新が必要です。');
+    connectionReady = true;
+    el('access-help').hidden = true;
     el('top-msg').textContent = '';
   } catch (err) {
-    el('top-msg').textContent = err.message;
-    el('legacy-help').hidden = false;
-  } finally { disableEntry(false); }
-  if (eid) enterApp(eid.trim().toLowerCase());
+    el('top-msg').textContent = '';
+    el('access-help').hidden = false;
+    el('access-reason').textContent = hosted
+      ? err.message
+      : 'この画面から行事の保存先に接続できません。学校のGoogleアカウントで開いてください。';
+    el('google-actions').hidden = Boolean(hosted);
+    el('access-steps').hidden = Boolean(hosted);
+    updateRecoveryLink();
+  } finally {
+    checkingConnection = false;
+    el('retry-connection').disabled = false;
+    disableEntry(false);
+  }
+  if (connectionReady && invitedId) await enterApp(invitedId.trim().toLowerCase());
 }
 
 let setupDraft = null;

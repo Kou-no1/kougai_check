@@ -4,11 +4,66 @@ const CHAT_WINDOW = 100;
 
 function doGet(e) {
   const p = (e && e.parameter) || {};
+  if (!p.action || p.view === 'app') return hostedPage_(p);
   const cb = p.callback || '';
   if (cb && !/^[A-Za-z_$][0-9A-Za-z_$]{0,100}$/.test(cb)) {
     return output_({ok:false, error:'コールバック名が正しくありません'}, '');
   }
   return output_(handle_(p, false), cb);
+}
+
+// Googleのログインを通ったウェブアプリ内で、同じ画面を開く。
+function hostedPage_(p) {
+  let html;
+  if (typeof bundledAppHtml_ === 'function') {
+    html = bundledAppHtml_();
+  } else {
+    try {
+      html = HtmlService.createHtmlOutputFromFile('Index').getContent();
+    } catch (_) {
+      html = HtmlService.createHtmlOutputFromFile('index').getContent();
+    }
+  }
+  const event = String(p.event || '').trim().toLowerCase();
+  const boot = JSON.stringify({
+    appUrl: ScriptApp.getService().getUrl() || '',
+    eventId: /^[a-z0-9]{8}$/.test(event) ? event : ''
+  }).replace(/</g, '\\u003c');
+  const page = html.replace(/<head>/i, () => '<head><script>window.KOUGAI_HOSTED=' + boot + ';</script>');
+  return HtmlService.createHtmlOutput(page)
+    .setTitle('校外学習・チェックポイント通過管理')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+// HTML Serviceからの呼び出し。HTTP経由と同じ操作の検証・受付番号を使う。
+function appRequest(params) {
+  if (!params || typeof params !== 'object' || Array.isArray(params)) {
+    return {ok:false, code:'INVALID_INPUT', error:'入力を確認してください'};
+  }
+  if (params.action === 'capabilities') {
+    try {
+      openWorkbook_().getId();
+      return {ok:true, version:4};
+    } catch (err) {
+      return {ok:false, code:err.clientCode || 'SHEET_UNAVAILABLE',
+        error:err.clientCode ? err.message : '行事の保存先に接続できませんでした。'};
+    }
+  }
+  const request = Object.assign({}, params, {v:'4'});
+  if (['createEvent','saveConfig','toggle','reset','sendMessage'].includes(request.action) && !request.requestId) {
+    return {ok:false, code:'INVALID_INPUT', error:'操作の受付番号がありません。画面を開き直してください'};
+  }
+  // handle_内の許可リストとイベント・入力の検証を必ず通す。
+  return JSON.parse(JSON.stringify(handle_(request, true)));
+}
+
+function openWorkbook_() {
+  try {
+    return SpreadsheetApp.openById(SPREADSHEET_ID);
+  } catch (_) {
+    if (!SPREADSHEET_ID) invalid_('GASのSPREADSHEET_IDに行事の保存先を設定してください。', 'SHEET_NOT_CONFIGURED');
+    invalid_('行事の保存先を開けません。管理者にスプレッドシートIDと実行アカウントの権限を確認してください。', 'SHEET_UNAVAILABLE');
+  }
 }
 
 function doPost(e) {
@@ -51,7 +106,7 @@ function handle_(p, post) {
     if (!post && a !== 'getReceipt' && a !== 'getState' && (v4 || a === 'sendMessage')) {
       invalid_('更新にはPOSTを使用してください');
     }
-    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const ss = openWorkbook_();
     if (a === 'getReceipt') {
       const row = receipt_(ss, p.eventId, p.requestId);
       return row ? {ok:true, found:true, result:row.result} : {ok:true, found:false};
