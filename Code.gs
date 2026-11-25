@@ -12,7 +12,7 @@ function doGet(e) {
   return output_(handle_(p, false), cb);
 }
 
-// Googleのログインを通ったウェブアプリ内で、同じ画面を開く。
+// 先生用・外部参加者用ともにウェブアプリ内で同じ画面を開く。
 function hostedPage_(p) {
   let html;
   if (typeof bundledAppHtml_ === 'function') {
@@ -20,13 +20,14 @@ function hostedPage_(p) {
   } else {
     try {
       html = HtmlService.createHtmlOutputFromFile('Index').getContent();
-    } catch (_) {
+    } catch (error) {
       html = HtmlService.createHtmlOutputFromFile('index').getContent();
     }
   }
   const event = String(p.event || '').trim().toLowerCase();
   const boot = JSON.stringify({
     appUrl: ScriptApp.getService().getUrl() || '',
+    view: p.view === 'guest' || p.view === 'teacher' ? p.view : 'app',
     eventId: /^[a-z0-9]{8}$/.test(event) ? event : ''
   }).replace(/</g, '\\u003c');
   const page = html.replace(/<head>/i, () => '<head><script>window.KOUGAI_HOSTED=' + boot + ';</script>');
@@ -43,7 +44,7 @@ function appRequest(params) {
   if (params.action === 'capabilities') {
     try {
       openWorkbook_().getId();
-      return {ok:true, version:4};
+      return capabilities_(role_(params.view));
     } catch (err) {
       return {ok:false, code:err.clientCode || 'SHEET_UNAVAILABLE',
         error:err.clientCode ? err.message : '行事の保存先に接続できませんでした。'};
@@ -54,13 +55,41 @@ function appRequest(params) {
     return {ok:false, code:'INVALID_INPUT', error:'操作の受付番号がありません。画面を開き直してください'};
   }
   // handle_内の許可リストとイベント・入力の検証を必ず通す。
-  return JSON.parse(JSON.stringify(handle_(request, true)));
+  return JSON.parse(JSON.stringify(handle_(request, true, true)));
+}
+
+// Googleが確認したアクセスユーザーのメールだけを先生の判定に使う。
+function role_(view) {
+  if (view === 'guest') return 'guest';
+  try {
+    const active = String(Session.getActiveUser().getEmail() || '').trim().toLowerCase();
+    if (!active) return 'guest';
+    const staff = PropertiesService.getScriptProperties().getProperty('TEACHER_EMAILS') || '';
+    if (staff.toLowerCase().split(/[\s,;]+/).includes(active)) return 'teacher';
+    const owner = openWorkbook_().getOwner();
+    return owner && String(owner.getEmail()).trim().toLowerCase() === active ? 'teacher' : 'guest';
+  } catch (error) {
+    return 'guest';
+  }
+}
+
+function capabilities_(role) {
+  const result = {ok:true, version:4, role:role, guestAccess:true, teacherHostedOnly:true};
+  const url = (PropertiesService.getScriptProperties().getProperty('GUEST_APP_URL') || '').trim();
+  // Googleが発行する /exec URL のみを先生の共有リンクに使う。
+  const match = url.match(/^https:\/\/script\.google\.com\/(?:macros|a\/[A-Za-z0-9.-]+\/macros|a\/macros\/[A-Za-z0-9.-]+)\/s\/([A-Za-z0-9_-]+)\/exec$/);
+  if (match) result.guestUrl = 'https://script.google.com/macros/s/' + match[1] + '/exec';
+  return result;
+}
+
+function requireTeacher_() {
+  invalid_('この操作には先生用の権限が必要です。', 'TEACHER_REQUIRED');
 }
 
 function openWorkbook_() {
   try {
     return SpreadsheetApp.openById(SPREADSHEET_ID);
-  } catch (_) {
+  } catch (error) {
     if (!SPREADSHEET_ID) invalid_('GASのSPREADSHEET_IDに行事の保存先を設定してください。', 'SHEET_NOT_CONFIGURED');
     invalid_('行事の保存先を開けません。管理者にスプレッドシートIDと実行アカウントの権限を確認してください。', 'SHEET_UNAVAILABLE');
   }
@@ -89,14 +118,26 @@ function invalid_(message, code) {
   throw err;
 }
 
-function handle_(p, post) {
+function handle_(p, post, hosted) {
   try {
     if (!p || typeof p !== 'object' || Array.isArray(p)) invalid_('入力を確認してください');
     const a = p.action;
     const v4 = String(p.v) === '4';
-    if (a === 'capabilities') return {ok:true, version:4};
+    const role = role_(p.view);
+    const guest = !hosted || role !== 'teacher';
+    if (a === 'capabilities') return capabilities_(role);
     if (!['createEvent','getState','getReceipt','saveConfig','toggle','reset','sendMessage'].includes(a)) {
       invalid_('この操作には対応していません');
+    }
+    if (guest && (['createEvent','saveConfig','reset'].includes(a) || (a === 'getReceipt' && !p.eventId))) {
+      if (role === 'teacher' && !hosted) {
+        invalid_('行事の作成・設定・リセットは、Googleの先生用画面で操作してください。', 'HOSTED_TEACHER_REQUIRED');
+      }
+      requireTeacher_();
+    }
+    if (guest && ['sendMessage','toggle'].includes(a) &&
+        (!v4 || !post || !p.requestId || (a === 'toggle' && !['add','remove'].includes(p.op)))) {
+      invalid_('この操作は外部参加者用の画面から送信してください。', 'GUEST_ACTION_INVALID');
     }
     if (a !== 'createEvent' && !(a === 'getReceipt' && !p.eventId) &&
         (typeof p.eventId !== 'string' || !/^[a-z0-9]{8}$/.test(p.eventId))) {
@@ -108,13 +149,17 @@ function handle_(p, post) {
     }
     const ss = openWorkbook_();
     if (a === 'getReceipt') {
+      if (guest) eventSheet_(ss, p.eventId);
       const row = receipt_(ss, p.eventId, p.requestId);
+      if (guest && row && !['sendMessage','toggle'].includes(row.action)) return {ok:true, found:false};
       return row ? {ok:true, found:true, result:row.result} : {ok:true, found:false};
     }
-    if (a === 'getState') return state_(ss, p.eventId, v4);
+    if (a === 'getState') return state_(ss, p.eventId, v4, guest);
     const lock = LockService.getScriptLock();
     if (!lock.tryLock(25000)) return {ok:false, code:'BUSY', error:'混み合っています。もう一度お試しください'};
     try {
+      // 未登録IDでの投稿は受付用シートを作る前に終了する。
+      const guestSheet = guest ? eventSheet_(ss, p.eventId) : null;
       const scope = a === 'createEvent' ? '' : p.eventId;
       if (p.requestId) {
         const previous = receipt_(ss, scope, p.requestId);
@@ -127,7 +172,7 @@ function handle_(p, post) {
       try {
         if (a === 'createEvent') result = create_(ss, p, v4);
         else {
-          const sheet = eventSheet_(ss, p.eventId);
+          const sheet = guestSheet || eventSheet_(ss, p.eventId);
           if (a === 'saveConfig') result = saveConfig_(sheet, p, v4);
           if (a === 'toggle') result = toggle_(sheet, p, v4);
           if (a === 'reset') result = reset_(sheet, p);
@@ -350,12 +395,20 @@ function readPassages_(rows) {
   return records;
 }
 
-function state_(ss, id, v4) {
+function state_(ss, id, v4, guest) {
   const sheet = ss.getSheetByName(id);
   const rows = sheet ? sheet.getRange(1,1,Math.max(2,sheet.getLastRow()),5).getValues() : [];
   if (!rows.length || rows[0][0] !== '__meta__') invalid_('イベントが見つかりません', 'EVENT_NOT_FOUND');
   const c = config_(rows);
   const records = readPassages_(rows.slice(2));
+  if (guest) {
+    const groupIds = new Set(c.groups.map(g => g.id));
+    const checkpoints = new Set(c.checkpoints);
+    Object.keys(records).forEach(id => {
+      if (!groupIds.has(id)) delete records[id];
+      else Object.keys(records[id]).forEach(cp => { if (!checkpoints.has(cp)) delete records[id][cp]; });
+    });
+  }
   const result = {ok:true, eventId:id, eventName:c.name, checkpoints:c.checkpoints,
     groups:c.groups, records:records};
   if (v4) {
