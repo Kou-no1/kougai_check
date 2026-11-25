@@ -3,62 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CP通過管理</title>
+<title>校外学習 · チェックポイント通過管理</title>
+<meta name="referrer" content="no-referrer">
 <style>
+/* ===== BASE ===== */
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#f4f5f7;color:#1a1a1a;font-size:15px;min-height:100vh}
 button{font-family:inherit;cursor:pointer}
 
-/* ===== TOP ===== */
-.top{display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:28px 16px 40px;background:#f4f5f7}
-.top-logo{font-size:42px;margin-bottom:8px;margin-top:8px}
-.top-title{font-size:22px;font-weight:700;margin-bottom:3px}
-.top-sub{font-size:13px;color:#6b7280;margin-bottom:28px;text-align:center;line-height:1.6}
-.top-card{background:#fff;border-radius:16px;padding:22px 20px;width:100%;max-width:440px;border:1px solid #e5e7eb;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.tc-title{font-size:13px;font-weight:700;color:#374151;margin-bottom:14px;display:flex;align-items:center;gap:6px}
-.field-label{font-size:12px;color:#6b7280;font-weight:500;margin-bottom:5px;margin-top:12px}
-.field-label:first-of-type{margin-top:0}
-input[type=text],input[type=number]{width:100%;border:1px solid #d1d5db;border-radius:9px;padding:10px 13px;font-size:14px;outline:none;background:#fff}
-input:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
-.add-row{display:flex;gap:8px;margin-bottom:0}
-.add-row input{flex:1}
-.btn-add{border:1px solid #d1d5db;border-radius:9px;padding:9px 14px;font-size:13px;background:#fff;color:#374151;white-space:nowrap}
-.bulk-row{display:flex;gap:8px;margin-top:8px}
-.bulk-row input{width:80px;flex:none}
-.tag-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;min-height:28px}
-.tag{display:inline-flex;align-items:center;gap:3px;font-size:12px;padding:4px 10px;border-radius:999px;background:#f3f4f6;color:#374151;border:1px solid #e5e7eb}
-.tag-x{background:none;border:none;cursor:pointer;color:#9ca3af;font-size:15px;line-height:1;padding:0 2px}
-.btn-create{width:100%;max-width:440px;padding:14px;border-radius:12px;border:none;background:#111;color:#fff;font-size:16px;font-weight:700;margin-top:4px}
-.btn-create:disabled{background:#9ca3af}
-.top-msg{font-size:13px;text-align:center;color:#dc2626;margin-top:8px;min-height:20px}
+/* ===== TOP PAGE ===== */
+.top-page{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+.top-logo{font-size:40px;margin-bottom:8px}
+.top-title{font-size:22px;font-weight:700;margin-bottom:4px}
+.top-sub{font-size:13px;color:#6b7280;margin-bottom:32px}
+.top-card{background:#fff;border-radius:16px;padding:24px;width:100%;max-width:400px;border:1px solid #e5e7eb;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.top-card-title{font-size:13px;font-weight:600;color:#374151;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.top-card input{width:100%;border:1px solid #d1d5db;border-radius:10px;padding:11px 14px;font-size:15px;outline:none;margin-bottom:10px}
+.top-card input:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+.btn-create{width:100%;padding:13px;border-radius:10px;border:none;background:#111;color:#fff;font-size:15px;font-weight:600}
+.btn-join{width:100%;padding:13px;border-radius:10px;border:2px solid #111;background:#fff;color:#111;font-size:15px;font-weight:600}
+.top-msg{font-size:13px;text-align:center;min-height:20px;color:#dc2626}
 
-.divider{width:100%;max-width:440px;display:flex;align-items:center;gap:10px;margin:4px 0 4px;color:#9ca3af;font-size:12px}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:#e5e7eb}
-
-.join-card{background:#fff;border-radius:16px;padding:18px 20px;width:100%;max-width:440px;border:1px solid #e5e7eb;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.join-row{display:flex;gap:8px;margin-top:10px}
-.join-row input{flex:1}
-.btn-join{border:2px solid #111;border-radius:9px;padding:9px 16px;font-size:13px;font-weight:600;background:#fff;color:#111;white-space:nowrap}
-
-/* ===== MODAL ===== */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;align-items:center;justify-content:center;padding:20px}
+/* ===== CREATED MODAL ===== */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.show{display:flex}
 .modal{background:#fff;border-radius:20px;padding:28px 24px;width:100%;max-width:400px}
 .modal-title{font-size:18px;font-weight:700;margin-bottom:6px}
-.modal-sub{font-size:13px;color:#6b7280;margin-bottom:18px;line-height:1.6}
-.url-box{background:#f3f4f6;border-radius:10px;padding:12px 14px;font-size:12px;word-break:break-all;color:#374151;margin-bottom:12px;border:1px solid #e5e7eb;font-family:monospace;line-height:1.5}
-.btn-copy{width:100%;padding:12px;border-radius:10px;border:1px solid #d1d5db;background:#fff;font-size:14px;margin-bottom:10px;cursor:pointer}
-.btn-go{width:100%;padding:13px;border-radius:10px;border:none;background:#111;color:#fff;font-size:15px;font-weight:700;cursor:pointer}
+.modal-sub{font-size:13px;color:#6b7280;margin-bottom:20px}
+.url-box{background:#f3f4f6;border-radius:10px;padding:12px 14px;font-size:13px;word-break:break-all;color:#374151;margin-bottom:12px;border:1px solid #e5e7eb}
+.btn-copy{width:100%;padding:12px;border-radius:10px;border:1px solid #d1d5db;background:#fff;font-size:14px;margin-bottom:10px}
+.btn-go{width:100%;padding:13px;border-radius:10px;border:none;background:#111;color:#fff;font-size:15px;font-weight:600}
 
-/* ===== APP ===== */
+/* ===== APP SHELL ===== */
 .app{display:none;flex-direction:column;min-height:100vh}
 .app.show{display:flex}
-.app-hdr{background:#fff;border-bottom:1px solid #e5e7eb;padding:11px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
-.app-hdr-main{flex:1;overflow:hidden}
-.app-hdr-title{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.app-hdr-id{font-size:10px;color:#9ca3af;font-family:monospace;margin-top:1px}
+.app-header{background:#fff;border-bottom:1px solid #e5e7eb;padding:11px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+.app-header-title{font-size:15px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app-header-id{font-size:10px;color:#9ca3af;font-family:monospace}
 .sync{font-size:11px;padding:3px 9px;border-radius:999px;background:#dcfce7;color:#166534;white-space:nowrap}
-.sync.ing{background:#fef9c3;color:#854d0e}
+.sync.syncing{background:#fef9c3;color:#854d0e}
 .sync.err{background:#fee2e2;color:#991b1b}
 
 .tabs{display:flex;background:#fff;border-bottom:1px solid #e5e7eb}
@@ -68,44 +51,68 @@ input:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
 .page{display:none;padding:16px;flex:1}
 .page.active{display:block}
 
-/* ===== SETTINGS TAB ===== */
+/* ===== SETUP ===== */
 .card{background:#fff;border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid #e5e7eb}
 .card-label{font-size:12px;color:#6b7280;margin-bottom:8px;font-weight:500}
 .row{display:flex;gap:8px}
+input[type=text],input[type=number]{border:1px solid #d1d5db;border-radius:9px;padding:10px 13px;font-size:14px;outline:none;width:100%}
+input:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
 .btn{display:inline-flex;align-items:center;gap:5px;border:1px solid #d1d5db;border-radius:9px;padding:9px 15px;font-size:13px;background:#fff;color:#374151;white-space:nowrap}
 .btn-primary{background:#111;color:#fff;border-color:#111;font-weight:600}
 .btn-danger{border-color:#fca5a5;color:#dc2626}
-.save-btn{width:100%;padding:13px;border-radius:12px;border:none;background:#111;color:#fff;font-size:15px;font-weight:600;margin-top:4px;cursor:pointer}
+.tag-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:4px 10px;border-radius:999px;background:#f3f4f6;color:#374151;border:1px solid #e5e7eb}
+.tag-x{background:none;border:none;cursor:pointer;color:#9ca3af;font-size:16px;line-height:1;padding:0 2px}
+.save-btn{width:100%;padding:13px;border-radius:12px;border:none;background:#111;color:#fff;font-size:15px;font-weight:600;margin-top:4px}
 .setup-msg{font-size:13px;color:#6b7280;text-align:center;margin-top:10px;min-height:18px}
+
+/* ===== SHARE BAR ===== */
 .share-bar{background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
-.share-bar-url{font-size:11px;color:#1d4ed8;word-break:break-all;flex:1;font-family:monospace}
-.btn-share{font-size:12px;padding:7px 13px;border-radius:8px;border:1px solid #3b82f6;background:#fff;color:#2563eb;cursor:pointer;white-space:nowrap}
+.share-bar-url{font-size:12px;color:#1d4ed8;word-break:break-all;flex:1;font-family:monospace}
+.btn-share{font-size:12px;padding:6px 12px;border-radius:8px;border:1px solid #3b82f6;background:#fff;color:#2563eb}
 
 /* ===== CHECKIN MATRIX ===== */
 .ci-page{display:none;flex-direction:column;flex:1}
 .ci-page.active{display:flex}
-.ci-bar{background:#fff;border-bottom:1px solid #e5e7eb;padding:9px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px;color:#6b7280}
-.ci-prog{margin-left:auto;font-weight:700;color:#111;font-size:13px}
+.ci-bar{background:#fff;border-bottom:1px solid #e5e7eb;padding:9px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:#6b7280}
+.ci-bar-prog{margin-left:auto;font-weight:700;color:#111;font-size:13px}
 .leg{display:flex;align-items:center;gap:4px}
 .leg-box{width:13px;height:13px;border-radius:3px;border:1.5px solid}
 .leg-ok{background:#f0fdf4;border-color:#86efac}
 .leg-ng{background:#f9fafb;border-color:#e5e7eb}
 .ci-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;flex:1}
 .ci-matrix{border-collapse:separate;border-spacing:0;min-width:100%}
-.ci-matrix .col-g{position:sticky;left:0;z-index:3;background:#f9fafb;min-width:76px;max-width:96px;padding:10px;font-size:13px;font-weight:600;border-right:2px solid #d1d5db;border-bottom:1px solid #e5e7eb;white-space:nowrap}
+/* 固定班名列 */
+.ci-matrix .col-g{
+  position:sticky;left:0;z-index:3;background:#f9fafb;
+  min-width:76px;max-width:96px;padding:10px 10px;
+  font-size:13px;font-weight:600;
+  border-right:2px solid #d1d5db;border-bottom:1px solid #e5e7eb;
+  white-space:nowrap
+}
 .ci-matrix thead .col-g{background:#f3f4f6;color:#6b7280;font-size:11px;font-weight:500;border-bottom:2px solid #d1d5db}
-.ci-matrix thead th.col-cp{background:#f3f4f6;padding:8px 6px 6px;font-size:11px;font-weight:500;color:#374151;text-align:center;border-bottom:2px solid #d1d5db;border-right:1px solid #e5e7eb;white-space:nowrap;min-width:82px}
+/* CP列ヘッダー */
+.ci-matrix thead th.col-cp{
+  background:#f3f4f6;padding:8px 6px 6px;
+  font-size:11px;font-weight:500;color:#374151;
+  text-align:center;border-bottom:2px solid #d1d5db;
+  border-right:1px solid #e5e7eb;white-space:nowrap;min-width:82px
+}
 .cp-th-name{font-size:12px;font-weight:700;color:#111}
 .cp-th-cnt{font-size:10px;color:#6b7280;margin-top:2px}
+/* タイルセル */
 .ci-matrix td.t-cell{padding:5px;border-right:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;vertical-align:middle;min-width:82px}
 .tile{display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:9px;padding:8px 4px;min-height:54px;cursor:pointer;border:1.5px solid #e5e7eb;background:#f9fafb;user-select:none;-webkit-tap-highlight-color:transparent;transition:transform .08s}
 .tile:active{transform:scale(.93)}
 .tile.ok{background:#f0fdf4;border-color:#86efac}
+.tile.ok .t-ico{color:#16a34a}
 .tile.ok .t-time{color:#16a34a}
 .t-ico{font-size:20px;line-height:1}
 .t-time{font-size:10px;color:#9ca3af;margin-top:3px;min-height:14px}
+/* 偶数行縞 */
 .ci-matrix tbody tr:nth-child(even) .col-g{background:#f0f0f0}
 .ci-matrix tbody tr:nth-child(even) td.t-cell{background:#fafafa}
+/* 全完了行 */
 .ci-matrix tbody tr.all-ok .col-g{color:#15803d}
 .ci-hint{padding:8px 16px 12px;font-size:11px;color:#9ca3af}
 
@@ -128,130 +135,343 @@ tr:last-child td{border-bottom:none}
 .dot.ok2{background:#16a34a}.dot.ng{background:#dc2626}
 .empty-row{text-align:center;padding:2.5rem;color:#9ca3af;font-size:13px}
 .ov-actions{display:flex;gap:8px;margin-top:10px}
+
+[hidden]{display:none!important}
+:root{--field:#0c514c;--ink:#19332f;--border:#d5e4df}
+body{color:var(--ink);background:#f3f7f5;font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN','Yu Gothic',Meiryo,sans-serif}
+button,select,input,textarea{font-family:inherit}
+button:focus-visible,summary:focus-visible,select:focus-visible{outline:3px solid #007c73;outline-offset:2px}
+.top-page{justify-content:flex-start;padding-top:clamp(30px,7vh,76px);background:linear-gradient(160deg,#eaf4ec 0%,#f8faf9 55%,#f1f6f3 100%)}
+.top-title{font-size:clamp(23px,4vw,29px);color:#143f36}
+.top-logo{display:grid;place-items:center;border-radius:17px;width:54px;height:54px;background:#d9ede1;margin-bottom:12px;font-size:29px}
+.top-card{max-width:520px}.top-card-title{font-size:16px}.top-sub{margin:5px 0 22px}
+.btn-create,.btn-go,.save-btn,.btn-primary{background:var(--field);color:#fff;border-color:var(--field)}
+.btn-join{color:var(--field);border-color:var(--field)}
+.tabs{position:sticky;top:var(--header-height,53px);z-index:8}
+.tab{min-height:46px;font-weight:600}
+.tab.active{color:var(--field);border-bottom:3px solid var(--field);background:#f1f8f4}
+.sync{border:0}.app-header{min-height:53px}
+.ci-matrix .col-g{white-space:normal;overflow-wrap:anywhere;min-width:82px}
+.tile{width:100%;color:#64748b}.tile:disabled{opacity:.7}.tile.ok .t-ico,.tile.ok .t-time,.pass{color:#136540}
+.tile.ok{background:#e4f4e9;border-color:#77b38b}.t-time{color:#52615c}
+.ci-hint{color:#4b5563}.ci-page,.page,.tabs{min-width:0}
+#page-overview{width:100%;max-width:1200px;margin:0 auto}
+#connection-status,#checkin-msg:not(:empty){padding:8px 16px;color:#7c2d12;background:#fff4e5;font-size:13px}
+dialog#created-modal{margin:auto;padding:0;border:1px solid #d5e4df;border-radius:20px;width:min(400px,calc(100% - 32px))}
+#created-modal::backdrop{background:rgba(0,0,0,.5)}
+#join-card label{display:block;margin-bottom:5px;font-size:13px}#inp-join-id{font-size:16px}
+#top-msg{max-width:520px}.legacy-help{display:block;color:#245b50;margin:8px 0 18px;text-align:center;font-size:13px}
+#page-checkin .ci-scroll{flex:0 1 auto}
+@media(min-width:800px){.app-header,.tabs,.ci-bar{padding-left:max(16px,calc((100vw - 1180px)/2));padding-right:max(16px,calc((100vw - 1180px)/2))}.ci-scroll,.ci-hint,#checkin-msg{width:100%;max-width:1200px;margin-inline:auto}}
+@media(max-width:400px){.tab{font-size:12px}.page{padding:12px}.metrics{gap:5px}.metric{padding:10px 8px}.app-header{padding:8px 10px}}
+
+#create-card label {display:block; margin-bottom:5px; color:#475569; font-size:13px}
+#create-card input {min-width:0; font-size:16px; margin-bottom:0}
+#create-card .btn {justify-content:center}
+#create-details {border-top:1px solid #e5e7eb; margin:16px 0}
+#create-details summary {cursor:pointer; padding:10px 1px; color:#374151; font-size:14px; font-weight:600; text-align:left}
+#create-details form {margin:12px 0}
+#create-details .create-counts {display:grid; grid-template-columns:1fr 1fr; gap:8px}
+#create-details .create-counts label {min-width:0}
+#create-details .create-counts input {display:block; margin-top:4px}
+#create-cps .tag {max-width:100%; overflow-wrap:anywhere}
+#create-cps .tag-x {padding:4px}
+#create-groups {display:grid; gap:5px; max-height:15rem; overflow-y:auto}
+#create-groups .row {align-items:center; gap:4px}
+#create-groups .create-remove {border:0; background:transparent; padding:7px; min-width:36px; min-height:36px; color:#64748b; font-size:18px}
+#create-config-status {margin-top:7px; color:#475569; font-size:13px; line-height:1.5}
+#page-setup {width:100%; max-width:800px; margin:0 auto}
+#page-setup .setup-fields {padding:0; margin:0; border:0; min-width:0}
+#page-setup .setup-share-label {font-size:11px; color:#1d4ed8; font-weight:600; margin-bottom:3px}
+#page-setup .share-bar > div {min-width:0; flex:1}
+#page-setup .card-label {display:block}
+#page-setup input {min-width:0; font:inherit; font-size:16px}
+#page-setup button:focus-visible {outline:2px solid #4338ca; outline-offset:2px}
+#page-setup .setup-section-title {font-size:14px; font-weight:650; color:#374151; margin:0 0 12px}
+#page-setup .setup-bulk {display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto; gap:8px; align-items:end}
+#page-setup .setup-bulk label {font-size:12px; font-weight:500; color:#4b5563}
+#page-setup .setup-bulk input {display:block; margin-top:4px}
+#page-setup .setup-bulk .btn {min-height:40px; justify-content:center}
+#page-setup .setup-hint,#page-setup .setup-empty {font-size:12px; line-height:1.6; color:#6b7280}
+#page-setup .setup-hint {margin-top:9px}
+#page-setup .setup-single-label {margin-top:18px}
+#page-setup .setup-roster-label {display:flex; align-items:center; gap:8px; border-top:1px solid #e5e7eb; padding-top:16px; margin-top:16px}
+#setup-group-count {font-size:12px; font-weight:500; color:#6b7280}
+#page-setup .setup-roster {display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr)); gap:8px}
+#page-setup .setup-group-row {display:flex; align-items:center; gap:4px; min-width:0}
+#page-setup .setup-remove {background:transparent; border:0; border-radius:8px; color:#64748b; min-width:32px; min-height:36px; font-size:19px}
+#page-setup .setup-remove:hover {color:#b91c1c; background:#fef2f2}
+#page-setup .tag {max-width:100%; overflow-wrap:anywhere}
+#page-setup .tag-x {padding:4px; color:#64748b}
+#page-setup .setup-fields:disabled .save-btn,#page-setup .save-btn:disabled {opacity:.5; cursor:default}
+#setup-conflict {margin-top:12px; padding:12px; border-radius:10px; background:#fffbeb; border:1px solid #fde68a; color:#78350f; font-size:13px}
+#setup-conflict .btn {margin-top:8px}
+@media(max-width:430px) {
+  #page-setup .setup-bulk {grid-template-columns:repeat(2,minmax(0,1fr))}
+  #page-setup .setup-bulk .btn {grid-column:1/-1}
+}
+#participant-name{max-width:min(34vw,180px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#fff;color:#374151;border:1px solid #d1d5db;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:600}
+#participant-name:focus-visible,.chat-card button:focus-visible,.identity-dialog button:focus-visible,.chat-history:focus-visible{outline:2px solid #4f46e5;outline-offset:2px}
+.identity-dialog{margin:auto;padding:22px;border:1px solid #e5e7eb;border-radius:18px;width:min(370px,calc(100% - 32px));box-shadow:0 12px 42px rgba(17,24,39,.16);color:#111827}
+.identity-dialog::backdrop{background:rgba(17,24,39,.48)}
+.identity-dialog h2,.chat-heading h2{font-size:18px;line-height:1.5}
+#identity-help,.chat-heading p{font-size:13px;color:#4b5563;line-height:1.6;margin-top:3px}
+.identity-dialog label,.chat-compose label{display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:7px}
+.identity-dialog label{margin-top:20px}
+#identity-input,.chat-compose textarea{font-family:inherit;font-size:16px}
+#identity-error{font-size:13px;color:#b91c1c;margin-top:6px}
+.identity-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.identity-actions button,.chat-compose button{min-height:42px;justify-content:center}
+.chat-card{max-width:760px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden}
+.chat-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid #e5e7eb}
+#chat-limit{font-size:11px;color:#6b7280;white-space:nowrap}
+.chat-history{height:45vh;height:clamp(150px,45dvh,520px);overflow-y:auto;overscroll-behavior:contain;overflow-anchor:none;padding:12px 16px;background:#f8fafc}
+#chat-empty{color:#6b7280;text-align:center;margin:32px 0;font-size:14px}
+#chat-messages{display:grid;gap:10px;list-style:none}
+#chat-messages li{max-width:100%;width:fit-content;background:#fff;border:1px solid #e5e7eb;border-radius:3px 12px 12px 12px;padding:8px 12px;overflow-wrap:anywhere}
+.chat-meta{display:flex;column-gap:10px;row-gap:2px;flex-wrap:wrap;align-items:baseline}
+.chat-meta strong{font-size:12px;color:#1e3a8a}
+.chat-meta time{font-size:11px;color:#6b7280}
+.chat-body{white-space:pre-wrap;line-height:1.55;font-size:15px;margin-top:3px}
+.chat-jump{display:block;margin:8px auto;border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;font-size:12px;padding:6px 10px;border-radius:999px}
+.chat-jump[hidden]{display:none}
+.chat-compose{padding:12px 16px;border-top:1px solid #e5e7eb}
+.chat-compose textarea{display:block;width:100%;resize:vertical;border:1px solid #d1d5db;border-radius:9px;padding:9px 12px;line-height:1.45;color:#111827;background:#fff}
+.chat-compose textarea:focus{outline:2px solid #6366f1;outline-offset:-1px}
+.chat-send-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px}
+#chat-status{color:#4b5563;font-size:12px;line-height:1.5}
+#chat-status.chat-error{color:#b91c1c}
+#chat-send{min-width:70px}
+#chat-send:disabled{opacity:.45;cursor:default}
+.duty-panel {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 12px;
+}
+#duty-label { color: #374151; font-size: 13px; font-weight: 600; }
+#duty-cp {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #111827;
+  font: inherit;
+  min-height: 44px;
+  min-width: 0;
+  padding: 6px 9px;
+  width: 100%;
+}
+#duty-result { border-top: 1px solid #e5e7eb; padding-top: 9px; }
+#duty-count { color: #334155; font-size: 14px; font-weight: 600; }
+.duty-list-label { color: #6b7280; font-size: 12px; margin: 9px 0 5px; }
+#duty-groups { display: flex; flex-wrap: wrap; gap: 5px; list-style: none; }
+#duty-groups li {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  color: #7c2d12;
+  font-size: 13px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  padding: 4px 8px;
+}
+#unread-badge {
+  display: inline-block;
+  margin-inline-start: 3px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  color: #fff;
+  background: #b42335;
+  font: 700 10px/1.4 system-ui, sans-serif;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+#unread-badge[hidden] { display: none; }
+/* 片手でタップしたとき、通過ボタンがセルの幅いっぱいに反応する。 */
+.ci-matrix .tile { width: 100%; }
+.ci-matrix tbody .col-g {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.t-time, .ci-hint, .empty-row, .app-header-id { color: #475569; }
+.tile.ok .t-time, .tile.ok .t-ico, .pass { color: #166534; }
+.t-time { font-size: 12px; }
+
+button:focus-visible, select:focus-visible, summary:focus-visible,
+input:focus-visible, textarea:focus-visible {
+  outline: 2px solid #4338ca;
+  outline-offset: 2px;
+}
+@media (pointer: coarse) {
+  #sync-badge, #participant-name, .btn-share, .fbtn, .tab, .btn,
+  .chat-jump, #create-details summary { min-height: 44px; }
+  #create-groups .create-remove, #page-setup .setup-remove {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .tag-x { min-width: 32px; min-height: 32px; }
+  #inp-join-id { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tile:active { transform: none; }
+  .tile { transition: none; }
+}
 </style>
 </head>
 <body>
 
-<!-- ===== TOP PAGE ===== -->
-<div id="top-page" class="top">
-  <div class="top-logo">📍</div>
-  <div class="top-title">CP通過管理</div>
-  <div class="top-sub">林間学校・修学旅行・社会科見学向け<br>チェックポイント通過リアルタイム共有</div>
+<!-- ========== TOP PAGE ========== -->
+<div id="top-page" class="top-page">
 
-  <!-- 作成フォーム -->
-  <div class="top-card">
-    <div class="tc-title">✨ 新しいイベントを作成</div>
-
-    <div class="field-label">行事名</div>
-    <input type="text" id="c-ename" placeholder="例: 6年2組 修学旅行 2日目">
-
-    <div class="field-label">チェックポイント</div>
-    <div class="add-row">
-      <input type="text" id="c-cp" placeholder="例: 第1関門（公園入口）" onkeydown="if(event.key==='Enter')cAddCP()">
-      <button class="btn-add" onclick="cAddCP()">追加</button>
-    </div>
-    <div class="tag-list" id="c-cp-tags"></div>
-
-    <div class="field-label">班</div>
-    <div class="add-row">
-      <input type="text" id="c-grp" placeholder="例: 1班" onkeydown="if(event.key==='Enter')cAddGrp()">
-      <button class="btn-add" onclick="cAddGrp()">追加</button>
-    </div>
-    <div class="bulk-row">
-      <input type="number" id="c-gn" placeholder="班の数" min="1" max="40">
-      <button class="btn-add" onclick="cBulkGrp()">まとめて追加</button>
-    </div>
-    <div class="tag-list" id="c-grp-tags"></div>
-  </div>
-
-  <button class="btn-create" id="btn-create" onclick="createNewEvent()">
-    🚀 イベントを作成してURLを発行
-  </button>
-  <div class="top-msg" id="top-msg"></div>
-
-  <div class="divider">または</div>
-
-  <!-- 参加フォーム -->
-  <div class="join-card">
-    <div class="tc-title" style="margin-bottom:4px">🔗 既存イベントに参加</div>
-    <div style="font-size:12px;color:#6b7280">URLを受け取った場合はそのまま開くだけでOK</div>
-    <div class="join-row">
-      <input type="text" id="j-id" placeholder="イベントID（例: abc12345）">
-      <button class="btn-join" onclick="joinById()">参加</button>
-    </div>
-  </div>
+  <div class="top-logo" aria-hidden="true">📍</div>
+  <h1 class="top-title">チェックポイント通過管理</h1>
+  <p class="top-sub">校外学習・修学旅行</p>
+<section class="top-card" id="create-card" aria-labelledby="create-title">
+  <h2 class="top-card-title" id="create-title">新しいイベントを作成</h2>
+  <label for="inp-ename">行事名</label>
+  <input id="inp-ename" type="text" maxlength="120" placeholder="例：6年生 修学旅行">
+  <details id="create-details">
+    <summary>チェックポイント・班を先に登録</summary>
+    <form id="create-cp-form">
+      <label for="create-cp">チェックポイント</label>
+      <div class="row">
+        <input id="create-cp" type="text" maxlength="80" placeholder="例：公園入口" required>
+        <button class="btn" type="submit">追加</button>
+      </div>
+      <div id="create-cps" class="tag-list"></div>
+    </form>
+    <form id="create-bulk-form">
+      <div class="create-counts">
+        <label for="create-classes">組の数<input id="create-classes" type="number" inputmode="numeric" min="1" max="400" step="1" placeholder="例：2" required></label>
+        <label for="create-teams">各組の班数<input id="create-teams" type="number" inputmode="numeric" min="1" max="400" step="1" placeholder="例：3" required></label>
+      </div>
+      <button class="btn" type="submit">班をまとめて追加</button>
+    </form>
+    <form id="create-group-form">
+      <label for="create-group">班を1つ追加</label>
+      <div class="row">
+        <input id="create-group" type="text" maxlength="80" placeholder="例：2組7班" required>
+        <button class="btn" type="submit">追加</button>
+      </div>
+    </form>
+    <div id="create-groups"></div>
+    <p role="status" id="create-config-status"></p>
+  </details>
+  <button class="btn-create" id="btn-create" type="button" onclick="createFieldEvent()">イベントを作成</button>
+</section>
+  <form class="top-card" id="join-card" onsubmit="event.preventDefault(); joinEvent()">
+    <h2 class="top-card-title">イベントに参加</h2>
+    <label for="inp-join-id">イベントID</label>
+    <input type="text" id="inp-join-id" maxlength="8" placeholder="例：abc12345" autocapitalize="none" spellcheck="false" required>
+    <button class="btn-join" type="submit">参加する</button>
+  </form>
+  <div role="status" class="top-msg" id="top-msg"></div>
+  <a class="legacy-help" id="legacy-help" href="legacy.html" hidden>従来の通過管理を開く</a>
 </div>
-
-<!-- ===== 作成完了モーダル ===== -->
-<div class="modal-overlay" id="modal">
+<dialog id="created-modal" aria-labelledby="created-title">
   <div class="modal">
-    <div class="modal-title">🎉 作成完了！</div>
-    <div class="modal-sub">下のURLを引率教員全員にLINEで送ってください。<br>開くだけで参加・チェックインできます。</div>
+    <h2 class="modal-title" id="created-title">イベントを作成しました</h2>
+    <p class="modal-sub">このURLから、同じ行事に参加できます。</p>
     <div class="url-box" id="modal-url"></div>
-    <button class="btn-copy" onclick="copyModalUrl()">📋 URLをコピー</button>
-    <button class="btn-go" onclick="goToEvent()">このイベントを開く →</button>
+    <button class="btn-copy" type="button" onclick="copyUrl()">招待URLをコピー</button>
+    <button class="btn-go" type="button" onclick="goToEvent()">このイベントを開く →</button>
   </div>
-</div>
-
-<!-- ===== APP ===== -->
-<div class="app" id="app">
-  <div class="app-hdr">
-    <div class="app-hdr-main">
-      <div class="app-hdr-title" id="hdr-title">読み込み中...</div>
-      <div class="app-hdr-id" id="hdr-id"></div>
+</dialog>
+<dialog class="identity-dialog" id="identity-dialog" aria-labelledby="identity-title" aria-describedby="identity-help">
+  <form id="identity-form">
+    <h2 id="identity-title">参加する名前を入力</h2>
+    <p id="identity-help">この行事のチャットに表示されます。</p>
+    <label for="identity-input">名前</label>
+    <input type="text" id="identity-input" placeholder="例：田中先生" maxlength="24" autocomplete="off" enterkeyhint="done" required>
+    <p id="identity-error" role="alert"></p>
+    <div class="identity-actions">
+      <button type="button" class="btn" id="identity-cancel">戻る</button>
+      <button type="submit" class="btn btn-primary" id="identity-submit">参加する</button>
     </div>
-    <span class="sync ing" id="sync-badge">同期中</span>
+  </form>
+</dialog>
+<!-- ========== APP ========== -->
+<div class="app" id="app">
+  <div class="app-header">
+    <div style="flex:1;overflow:hidden">
+      <div class="app-header-title" id="hdr-title">読み込み中...</div>
+      <div class="app-header-id" id="hdr-id"></div>
+    </div>
+    <button id="participant-name" type="button" onclick="changeParticipantName()">名前を入力</button>
+    <button class="sync" id="sync-badge" type="button" aria-label="同期状況・タップで更新">同期済</button>
   </div>
-
-  <div class="tabs">
-    <button class="tab active" onclick="showTab('setup',this)">⚙️ 設定</button>
-    <button class="tab" onclick="showTab('checkin',this)">✅ チェックイン</button>
-    <button class="tab" onclick="showTab('overview',this)">📋 一覧</button>
-  </div>
-
-  <!-- 設定タブ（事後編集用） -->
-  <div class="page active" id="page-setup">
-    <div class="share-bar">
-      <div style="flex:1;min-width:0">
-        <div style="font-size:11px;color:#1d4ed8;font-weight:600;margin-bottom:3px">📎 招待URL</div>
+  <nav class="tabs" aria-label="行事メニュー">
+    <button class="tab" type="button" data-tab="checkin">通過記録</button>
+    <button class="tab" type="button" data-tab="overview">一覧</button>
+    <button class="tab" type="button" data-tab="chat">チャット <span id="unread-badge" hidden></span></button>
+    <button class="tab" type="button" data-tab="setup">設定</button>
+  </nav>
+  <div id="connection-status" role="status" hidden></div>
+<div class="page active" id="page-setup">
+    <div class="share-bar" id="share-bar">
+      <div>
+        <div class="setup-share-label">📎 招待URL</div>
         <div class="share-bar-url" id="share-url"></div>
       </div>
-      <button class="btn-share" onclick="shareUrl()">共有</button>
+      <button type="button" class="btn-share" onclick="shareUrl()">共有</button>
     </div>
-    <div class="card">
-      <div class="card-label">行事名</div>
-      <input type="text" id="inp-event" placeholder="例: 6年2組 修学旅行 2日目">
-    </div>
-    <div class="card">
-      <div class="card-label">チェックポイント</div>
-      <div class="row">
-        <input type="text" id="inp-cp" placeholder="例: 第1関門（公園入口）" style="flex:1" onkeydown="if(event.key==='Enter')addCP()">
-        <button class="btn" onclick="addCP()">追加</button>
-      </div>
-      <div class="tag-list" id="cp-tags"></div>
-    </div>
-    <div class="card">
-      <div class="card-label">班</div>
-      <div class="row">
-        <input type="text" id="inp-group" placeholder="例: 1班" style="flex:1" onkeydown="if(event.key==='Enter')addGroup()">
-        <button class="btn" onclick="addGroup()">追加</button>
-      </div>
-      <div class="row" style="margin-top:8px">
-        <input type="number" id="inp-gn" placeholder="班の数" min="1" max="40" style="width:90px;flex:none">
-        <button class="btn" onclick="bulkGroups()">まとめて追加</button>
-      </div>
-      <div class="tag-list" id="group-tags"></div>
-    </div>
-    <button class="save-btn" onclick="saveConfig()">💾 設定を保存</button>
-    <div class="setup-msg" id="setup-msg"></div>
-  </div>
 
-  <!-- チェックインタブ -->
+    <fieldset class="setup-fields" id="setup-fields" disabled>
+      <div class="card">
+        <label class="card-label" for="inp-event">行事名</label>
+        <input type="text" id="inp-event" maxlength="120" placeholder="例：6年生 修学旅行" oninput="setupMarkEdited()">
+      </div>
+
+      <div class="card">
+        <label class="card-label" for="inp-cp">チェックポイント</label>
+        <form class="row" onsubmit="event.preventDefault(); addCP()">
+          <input type="text" id="inp-cp" maxlength="80" placeholder="例：公園入口">
+          <button type="submit" class="btn">追加</button>
+        </form>
+        <div class="tag-list" id="cp-tags"></div>
+      </div>
+
+      <div class="card">
+        <div class="setup-section-title">班をまとめて追加</div>
+        <form class="setup-bulk" onsubmit="event.preventDefault(); bulkGroups()">
+          <label for="inp-cn">組の数
+            <input type="number" inputmode="numeric" id="inp-cn" min="1" max="400" step="1" placeholder="例：3" required>
+          </label>
+          <label for="inp-gn">各組の班数
+            <input type="number" inputmode="numeric" id="inp-gn" min="1" max="400" step="1" placeholder="例：6" required>
+          </label>
+          <button type="submit" class="btn btn-primary">まとめて追加</button>
+        </form>
+        <p class="setup-hint">3組 × 各6班なら、1組1班から3組6班までの18班を追加します。</p>
+
+        <label class="card-label setup-single-label" for="inp-group">班を1つ追加</label>
+        <form class="row" onsubmit="event.preventDefault(); addGroup()">
+          <input type="text" id="inp-group" maxlength="80" placeholder="例：2組7班">
+          <button type="submit" class="btn">追加</button>
+        </form>
+        <div class="setup-section-title setup-roster-label">
+          <span>班の名前を編集</span><span id="setup-group-count"></span>
+        </div>
+        <div class="setup-roster" id="group-tags"></div>
+      </div>
+
+      <button type="button" class="save-btn" id="setup-save" onclick="saveConfig()">設定を保存</button>
+    </fieldset>
+    <div class="setup-msg" id="setup-msg" role="status" aria-live="polite"></div>
+    <div id="setup-conflict" hidden>
+      <p>ほかの端末で設定が更新されました。</p>
+      <button type="button" class="btn" onclick="reloadSetup()">最新の設定を読み込む</button>
+    </div>
+  </div>
+  <!-- チェックイン -->
   <div class="ci-page" id="page-checkin">
     <div class="ci-bar">
       <div class="leg"><div class="leg-box leg-ok"></div>通過済</div>
       <div class="leg"><div class="leg-box leg-ng"></div>未通過</div>
-      <div class="ci-prog" id="ci-prog"></div>
+      <div class="ci-bar-prog" id="ci-prog"></div>
     </div>
     <div class="ci-scroll">
       <table class="ci-matrix">
@@ -259,358 +479,1110 @@ tr:last-child td{border-bottom:none}
         <tbody id="ci-body"></tbody>
       </table>
     </div>
+    <p id="checkin-msg" role="status"></p>
     <div class="ci-hint">タイルをタップ → 通過記録。もう一度タップで取消</div>
   </div>
 
-  <!-- 一覧タブ -->
+  <!-- 一覧 -->
   <div class="page" id="page-overview">
     <div class="metrics">
       <div class="metric"><div class="m-label">総通過数</div><div class="m-val" id="m-tot">0</div></div>
       <div class="metric"><div class="m-label">全完了班</div><div class="m-val" id="m-ok">0</div></div>
       <div class="metric"><div class="m-label">未通過あり</div><div class="m-val" id="m-ng">0</div></div>
     </div>
+<section class="duty-panel" aria-labelledby="duty-label">
+  <label id="duty-label" for="duty-cp">担当チェックポイント</label>
+  <select id="duty-cp" onchange="renderDuty()">
+    <option value="">全チェックポイント</option>
+  </select>
+  <div id="duty-result" hidden>
+    <p id="duty-count" role="status"></p>
+    <div id="duty-missing" hidden>
+      <p class="duty-list-label" id="duty-missing-label">未通過の班</p>
+      <ul id="duty-groups" aria-labelledby="duty-missing-label"></ul>
+    </div>
+  </div>
+</section>
     <div class="filter-row">
       <button class="fbtn active" id="f-all" onclick="setFilter('all')">全班</button>
-      <button class="fbtn" id="f-ok"  onclick="setFilter('ok')">全完了</button>
-      <button class="fbtn" id="f-ng"  onclick="setFilter('ng')">未通過あり</button>
+      <button class="fbtn" id="f-ok" onclick="setFilter('ok')">全完了</button>
+      <button class="fbtn" id="f-ng" onclick="setFilter('ng')">未通過あり</button>
     </div>
     <div class="ov-wrap">
-      <table><thead><tr id="ov-hdr"></tr></thead><tbody id="ov-body"></tbody></table>
+      <table>
+        <thead><tr id="ov-hdr"></tr></thead>
+        <tbody id="ov-body"></tbody>
+      </table>
     </div>
     <div class="ov-actions">
       <button class="btn" onclick="copyText()" style="font-size:12px">📋 テキストコピー</button>
-      <button class="btn btn-danger" onclick="doReset()" style="font-size:12px">🗑 記録リセット</button>
+      <button id="reset-btn" class="btn btn-danger" onclick="doReset()" style="font-size:12px">🗑 記録リセット</button>
     </div>
   </div>
+<section class="page" id="page-chat" aria-labelledby="chat-title">
+  <div class="chat-card">
+    <div class="chat-heading">
+      <div>
+        <h2 id="chat-title">全体チャット</h2>
+        <p>この行事の参加者全員に届きます。</p>
+      </div>
+      <span id="chat-limit" hidden>最新100件</span>
+    </div>
+    <div class="chat-history" id="chat-history" tabindex="0" aria-label="投稿履歴">
+      <p id="chat-empty">まだ投稿はありません。</p>
+      <ol id="chat-messages" role="log" aria-label="チャットの投稿" aria-live="polite" aria-relevant="additions"></ol>
+    </div>
+    <button type="button" class="chat-jump" id="chat-jump" hidden>新しい投稿を見る ↓</button>
+    <form class="chat-compose" id="chat-form">
+      <label for="chat-text">メッセージ</label>
+      <textarea id="chat-text" rows="2" maxlength="300" placeholder="例：1組3班、全員到着しました。"></textarea>
+      <div class="chat-send-row">
+        <p id="chat-status" role="status"></p>
+        <button type="submit" class="btn btn-primary" id="chat-send" disabled>送信</button>
+      </div>
+    </form>
+  </div>
+</section>
 </div>
-
 <script>
-// ★ GAS WebアプリURL
+// このURLは、現在使用しているApps Scriptウェブアプリの /exec URL。
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwEHr5typEWu4A2nldXnV1VJMUMnCrwufTKAYPp3DM4rcy7SFChXD7xhWiddD4HRT4/exec';
+const S = {eventId:'', eventName:'', checkpoints:[], groups:[], records:{}, messages:[], configVersion:null, filter:'all'};
+const el = id => document.getElementById(id);
+let createdUrl = '';
+let activeTab = 'setup';
+let live = false;
+let joining = false;
+let createIntent = null;
+let readSequence = 0;
+let polling = null;
+let viewSignature = '';
+let resetting = false;
+const busyCells = new Set();
 
-// ===== 状態 =====
-let S = { eventId:'', eventName:'', checkpoints:[], groups:[], records:{}, filter:'all' };
-let tCPs=[], tGrps=[];       // 設定タブ用の一時リスト
-let cCPs=[], cGrps=[];       // 作成フォーム用の一時リスト
-let pollTimer=null, createdUrl='';
+function makeId() {
+  if (crypto.randomUUID) return crypto.randomUUID();
+  const b = crypto.getRandomValues(new Uint8Array(16));
+  b[6] = (b[6] & 15) | 64;
+  b[8] = (b[8] & 63) | 128;
+  const h = Array.from(b, v => v.toString(16).padStart(2, '0')).join('');
+  return [h.slice(0,8), h.slice(8,12), h.slice(12,16), h.slice(16,20), h.slice(20)].join('-');
+}
 
-// ===== JSONP =====
-let _ci=0;
-function api(params){
-  return new Promise((resolve,reject)=>{
-    const cb='__gcb'+(++_ci);
-    const tid=setTimeout(()=>{ delete window[cb]; reject(new Error('timeout')); },15000);
-    window[cb]=(d)=>{ clearTimeout(tid); delete window[cb]; document.getElementById(cb)?.remove(); resolve(d); };
-    const qs=new URLSearchParams({...params,callback:cb}).toString();
-    const s=document.createElement('script');
-    s.id=cb; s.src=GAS_URL+'?'+qs;
-    s.onerror=()=>{ clearTimeout(tid); delete window[cb]; s.remove(); reject(new Error('network error')); };
-    document.head.appendChild(s);
+function checked(result) {
+  if (result && result.ok) return result;
+  const err = new Error(result?.error || 'サーバーから応答がありません。');
+  err.code = result?.code || 'API_ERROR';
+  throw err;
+}
+
+// 読み込みはJSONP。名前・本文などの書き込みデータはPOST本文で送る。
+function readApi(params, timeout = 18000) {
+  return new Promise((resolve, reject) => {
+    const cb = 'cp_' + makeId().replace(/-/g, '');
+    const script = document.createElement('script');
+    const finish = () => {
+      clearTimeout(timer);
+      script.remove();
+      delete window[cb];
+    };
+    const failed = () => { finish(); reject(new Error('接続できません。電波を確認してもう一度お試しください。')); };
+    const timer = setTimeout(failed, timeout);
+    window[cb] = result => { finish(); resolve(result); };
+    script.onerror = failed;
+    script.referrerPolicy = 'no-referrer';
+    script.src = GAS_URL + '?' + new URLSearchParams({...params, v:'4', callback:cb});
+    document.head.appendChild(script);
   });
 }
 
-// ===== 起動 =====
-(function init(){
-  const eid=new URLSearchParams(location.search).get('event');
-  if(eid){ enterApp(eid); }
-  else   { document.getElementById('top-page').style.display='flex'; }
-})();
-
-// ===== 作成フォーム：CP =====
-function cAddCP(){
-  const v=document.getElementById('c-cp').value.trim();
-  if(!v||cCPs.includes(v)) return;
-  cCPs.push(v); document.getElementById('c-cp').value=''; renderCTags();
-}
-function cAddGrp(){
-  const v=document.getElementById('c-grp').value.trim();
-  if(!v||cGrps.includes(v)) return;
-  cGrps.push(v); document.getElementById('c-grp').value=''; renderCTags();
-}
-function cBulkGrp(){
-  const n=parseInt(document.getElementById('c-gn').value);
-  if(!n) return;
-  for(let i=1;i<=n;i++){ const nm=i+'班'; if(!cGrps.includes(nm)) cGrps.push(nm); }
-  document.getElementById('c-gn').value=''; renderCTags();
-}
-function renderCTags(){
-  document.getElementById('c-cp-tags').innerHTML=
-    cCPs.map((v,i)=>`<span class="tag">${v}<button class="tag-x" onclick="cCPs.splice(${i},1);renderCTags()">×</button></span>`).join('')
-    ||'<span style="font-size:12px;color:#9ca3af">なし</span>';
-  document.getElementById('c-grp-tags').innerHTML=
-    cGrps.map((v,i)=>`<span class="tag">${v}<button class="tag-x" onclick="cGrps.splice(${i},1);renderCTags()">×</button></span>`).join('')
-    ||'<span style="font-size:12px;color:#9ca3af">なし</span>';
+const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
+async function api(params) {
+  if (params.action === 'getState') return checked(await readApi(params));
+  const requestId = params.requestId || makeId();
+  const deadline = Date.now() + 40000;
+  const body = JSON.stringify({...params, v:'4', requestId});
+  const post = async () => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), Math.max(1, Math.min(11000, deadline - Date.now())));
+    try {
+      await fetch(GAS_URL, {method:'POST', mode:'no-cors', credentials:'include', body, signal:controller.signal});
+    } catch (_) {
+      // POST受信後の切断でも、受付結果を確認してから再送する。
+    } finally { clearTimeout(timer); }
+  };
+  await post();
+  for (let attempt = 0; attempt < 5 && Date.now() < deadline; attempt++) {
+    if (attempt > 0) await pause(Math.min(1500, attempt * 450));
+    let ack;
+    try {
+      const timeout = Math.max(1, Math.min(7500, deadline - Date.now()));
+      ack = await readApi({action:'getReceipt', eventId:params.eventId || '', requestId}, timeout);
+    } catch (err) { if (!navigator.onLine) throw err; }
+    if (ack?.ok && ack.found) return checked(ack.result);
+    if (ack && !ack.ok) return checked(ack);
+    if (attempt === 1 && Date.now() < deadline) await post();
+  }
+  throw new Error('送信結果を確認できません。通信状況を確認してから、もう一度お試しください。');
 }
 
-// ===== イベント作成（一発） =====
-async function createNewEvent(){
-  const name=document.getElementById('c-ename').value.trim();
-  const msg=document.getElementById('top-msg');
-  if(!name)           { msg.textContent='行事名を入力してください'; return; }
-  if(!cCPs.length)    { msg.textContent='CPを1つ以上追加してください'; return; }
-  if(!cGrps.length)   { msg.textContent='班を1つ以上追加してください'; return; }
+function inviteUrl(eid) {
+  const url = new URL(location.href);
+  url.search = ''; url.hash = '';
+  url.searchParams.set('event', eid);
+  return url.href;
+}
 
-  const btn=document.getElementById('btn-create');
-  btn.disabled=true; btn.textContent='作成中...'; msg.textContent='';
+async function copyValue(value, done) {
+  try { await navigator.clipboard.writeText(value); alert(done); }
+  catch (_) { prompt('コピーする内容', value); }
+}
+function copyUrl() { return copyValue(createdUrl, '招待URLをコピーしました。'); }
+async function shareUrl() {
+  const url = inviteUrl(S.eventId);
+  if (navigator.share) {
+    try { await navigator.share({title:S.eventName, url}); return; }
+    catch (err) { if (err.name === 'AbortError') return; }
+  }
+  await copyValue(url, '招待URLをコピーしました。');
+}
 
+function disableEntry(value) {
+  document.querySelectorAll('#top-page button').forEach(button => { button.disabled = value; });
+}
+async function createFieldEvent() {
+  const name = el('inp-ename').value.trim();
+  if (!name) { el('top-msg').textContent = '行事名を入力してください。'; return; }
+  if (joining) return;
+  joining = true; disableEntry(true);
+  el('top-msg').textContent = '作成中…';
   try {
-    // 1. イベント作成
-    const res=await api({ action:'createEvent', eventName:name });
-    if(!res.ok) throw new Error(res.error);
+    const config = readCreateConfig();
+    const signature = JSON.stringify([name, config]);
+    if (!createIntent || createIntent.signature !== signature) createIntent = {signature, id:makeId()};
+    const result = await api({action:'createEvent', eventName:name, ...config, requestId:createIntent.id});
+    S.eventId = result.eventId;
+    createdUrl = inviteUrl(S.eventId);
+    el('inp-join-id').value = S.eventId;
+    el('modal-url').textContent = createdUrl;
+    el('created-modal').showModal();
+    el('top-msg').textContent = '';
+    createIntent = null;
+  } catch (err) { el('top-msg').textContent = err.message; }
+  finally { joining = false; disableEntry(false); }
+}
+function goToEvent() { el('created-modal').close(); enterApp(S.eventId); }
+function joinEvent() { return enterApp(el('inp-join-id').value.trim().toLowerCase()); }
 
-    // 2. CP・班を即保存
-    const r2=await api({
-      action:'saveConfig', eventId:res.eventId,
-      eventName:name,
-      checkpoints:JSON.stringify(cCPs),
-      groups:JSON.stringify(cGrps)
-    });
-    if(!r2.ok) throw new Error(r2.error);
+function applyState(data) {
+  if (!Array.isArray(data.groups) || !Array.isArray(data.messages) || !Number.isInteger(data.configVersion)) {
+    throw new Error('GASを更新すると、新しい画面を使えます。');
+  }
+  S.eventName = data.eventName;
+  S.checkpoints = data.checkpoints;
+  S.groups = data.groups;
+  S.records = data.records || {};
+  S.messages = data.messages;
+  S.configVersion = data.configVersion;
+}
 
-    S.eventId=res.eventId;
-    createdUrl=location.origin+location.pathname+'?event='+res.eventId;
-    document.getElementById('modal-url').textContent=createdUrl;
-    document.getElementById('modal').classList.add('show');
-  } catch(e) {
-    msg.textContent='エラー: '+e.message;
-  } finally {
-    btn.disabled=false; btn.textContent='🚀 イベントを作成してURLを発行';
+async function enterApp(eid) {
+  if (joining) return;
+  if (!/^[a-z0-9]{8}$/.test(eid)) { el('top-msg').textContent = '8文字のイベントIDを入力してください。'; return; }
+  joining = true; disableEntry(true);
+  el('inp-join-id').value = eid;
+  el('top-msg').textContent = '行事を確認中…';
+  try {
+    const data = await api({action:'getState', eventId:eid});
+    S.eventId = eid;
+    applyState(data);
+    if (!(await ensureParticipantName())) { el('top-msg').textContent = ''; return; }
+    history.replaceState({}, '', inviteUrl(eid));
+    el('top-page').style.display = 'none';
+    el('app').classList.add('show');
+    el('hdr-id').textContent = 'ID ' + eid;
+    el('share-url').textContent = inviteUrl(eid);
+    live = true;
+    viewSignature = '';
+    showTab(S.groups.length && S.checkpoints.length ? 'checkin' : 'setup');
+    renderAll();
+    showSync(true);
+    schedulePoll();
+  } catch (err) { el('top-msg').textContent = err.message; }
+  finally { joining = false; disableEntry(false); }
+}
+
+function showSync(ok) {
+  const badge = el('sync-badge');
+  badge.textContent = ok ? '同期済' : '再接続';
+  badge.className = ok ? 'sync' : 'sync err';
+  badge.title = ok ? '同期済み・タップで更新' : '同期できませんでした。タップで再試行';
+  const status = el('connection-status');
+  status.hidden = ok;
+  if (ok) status.textContent = '';
+  else status.textContent = '通信が途切れています。前回同期した内容を表示しています。';
+}
+
+async function fetchState() {
+  if (!live) return false;
+  const seq = ++readSequence;
+  const eid = S.eventId;
+  try {
+    const d = await api({action:'getState', eventId:eid});
+    if (seq !== readSequence || eid !== S.eventId) return false;
+    applyState(d); renderAll(); showSync(true);
+    return true;
+  } catch (err) {
+    if (seq === readSequence && eid === S.eventId) showSync(false);
+    return false;
   }
 }
 
-function copyModalUrl(){
-  navigator.clipboard.writeText(createdUrl)
-    .then(()=>alert('URLをコピーしました！LINEなどで共有してください'))
-    .catch(()=>prompt('コピーしてください:',createdUrl));
+function schedulePoll() {
+  clearTimeout(polling);
+  if (live && !document.hidden) polling = setTimeout(pollNow, 5000);
 }
-function goToEvent(){
-  document.getElementById('modal').classList.remove('show');
-  enterApp(S.eventId);
-}
-
-// ===== 参加 =====
-async function joinById(){
-  const eid=document.getElementById('j-id').value.trim();
-  const msg=document.getElementById('top-msg');
-  if(!eid){ msg.textContent='イベントIDを入力してください'; return; }
-  msg.textContent='確認中...';
-  try{
-    const r=await api({ action:'getState', eventId:eid });
-    if(!r.ok){ msg.textContent='イベントが見つかりません'; return; }
-    enterApp(eid);
-  }catch(e){ msg.textContent='エラーが発生しました'; }
+async function pollNow() {
+  clearTimeout(polling);
+  if (!live || document.hidden) return;
+  await fetchState();
+  schedulePoll();
 }
 
-// ===== アプリ画面へ =====
-function enterApp(eid){
-  S.eventId=eid;
-  document.getElementById('top-page').style.display='none';
-  document.getElementById('app').classList.add('show');
-  document.getElementById('hdr-id').textContent='ID: '+eid;
-  const inv=location.origin+location.pathname+'?event='+eid;
-  document.getElementById('share-url').textContent=inv;
-  history.replaceState({},'','?event='+eid);
-  fetchState().then(()=>startPolling());
-}
-
-// ===== タブ =====
-function showTab(name,btn){
-  const leaving=document.querySelector('.tab.active')?.textContent||'';
-  document.querySelectorAll('.page,.ci-page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  btn.classList.add('active');
-  // 設定タブから離れる時は最新状態を反映
-  if(leaving.includes('設定') && name!=='setup'){
-    tCPs=[...S.checkpoints]; tGrps=[...S.groups];
-    document.getElementById('inp-event').value=S.eventName;
-    renderTags();
-  }
-  if(name==='overview') renderOverview();
-  if(name==='checkin')  renderCheckin();
-}
-
-// ===== ポーリング（5秒） =====
-function startPolling(){
-  if(pollTimer) clearInterval(pollTimer);
-  pollTimer=setInterval(fetchState,5000);
-}
-async function fetchState(){
-  const b=document.getElementById('sync-badge');
-  b.textContent='同期中'; b.className='sync ing';
-  try{
-    const d=await api({ action:'getState', eventId:S.eventId });
-    if(d.ok){
-      S.eventName=d.eventName; S.checkpoints=d.checkpoints;
-      S.groups=d.groups;
-      // サーバー記録とローカル記録をマージ（直近タップ分の消失防止）
-      const srv=d.records||{};
-      const merged={};
-      Object.keys(srv).forEach(g=>{ merged[g]={...srv[g]}; });
-      Object.keys(S.records).forEach(g=>{
-        Object.keys(S.records[g]||{}).forEach(cp=>{
-          if(!merged[g]) merged[g]={};
-          if(!merged[g][cp]) merged[g][cp]=S.records[g][cp];
-        });
-      });
-      S.records=merged;
-      b.textContent='同期済'; b.className='sync';
-      renderAll();
-    }
-  }catch(e){ b.textContent='エラー'; b.className='sync err'; }
-}
-
-// ===== 設定タブ（事後編集） =====
-function addCP(){
-  const v=document.getElementById('inp-cp').value.trim();
-  if(!v||tCPs.includes(v)) return;
-  tCPs.push(v); document.getElementById('inp-cp').value=''; renderTags();
-}
-function addGroup(){
-  const v=document.getElementById('inp-group').value.trim();
-  if(!v||tGrps.includes(v)) return;
-  tGrps.push(v); document.getElementById('inp-group').value=''; renderTags();
-}
-function bulkGroups(){
-  const n=parseInt(document.getElementById('inp-gn').value);
-  if(!n) return;
-  for(let i=1;i<=n;i++){ const nm=i+'班'; if(!tGrps.includes(nm)) tGrps.push(nm); }
-  document.getElementById('inp-gn').value=''; renderTags();
-}
-function renderTags(){
-  document.getElementById('cp-tags').innerHTML=
-    tCPs.map((v,i)=>`<span class="tag">${v}<button class="tag-x" onclick="tCPs.splice(${i},1);renderTags()">×</button></span>`).join('')
-    ||'<span style="font-size:12px;color:#9ca3af">なし</span>';
-  document.getElementById('group-tags').innerHTML=
-    tGrps.map((v,i)=>`<span class="tag">${v}<button class="tag-x" onclick="tGrps.splice(${i},1);renderTags()">×</button></span>`).join('')
-    ||'<span style="font-size:12px;color:#9ca3af">なし</span>';
-}
-async function saveConfig(){
-  const name=document.getElementById('inp-event').value.trim();
-  const msg=document.getElementById('setup-msg');
-  if(!name)           { msg.textContent='行事名を入力してください'; return; }
-  if(!tCPs.length)    { msg.textContent='CPを1つ以上追加してください'; return; }
-  if(!tGrps.length)   { msg.textContent='班を1つ以上追加してください'; return; }
-  msg.textContent='保存中...';
-  try{
-    const r=await api({ action:'saveConfig', eventId:S.eventId, eventName:name,
-      checkpoints:JSON.stringify(tCPs), groups:JSON.stringify(tGrps) });
-    if(r.ok){ msg.textContent='✅ 保存しました'; await fetchState(); }
-    else    { msg.textContent='エラー: '+r.error; }
-  }catch(e){ msg.textContent='エラーが発生しました'; }
-}
-
-// ===== チェックイン =====
-function renderCheckin(){
-  const cps=S.checkpoints, gs=S.groups;
-  document.getElementById('ci-hdr').innerHTML='<th class="col-g">班</th>'+
-    cps.map(cp=>{
-      const cnt=gs.filter(g=>S.records[g]&&S.records[g][cp]).length;
-      return `<th class="col-cp"><div class="cp-th-name">${cp}</div><div class="cp-th-cnt">${cnt}/${gs.length}班</div></th>`;
-    }).join('');
-  const tbody=document.getElementById('ci-body');
-  if(!gs.length||!cps.length){
-    tbody.innerHTML=`<tr><td colspan="${cps.length+1}" class="empty-row">設定から班・CPを登録してください</td></tr>`;
-    document.getElementById('ci-prog').textContent=''; return;
-  }
-  let tot=0,total=gs.length*cps.length;
-  tbody.innerHTML=gs.map(g=>{
-    const allOk=cps.every(cp=>S.records[g]&&S.records[g][cp]);
-    const cells=cps.map(cp=>{
-      const p=S.records[g]&&S.records[g][cp]; if(p) tot++;
-      return `<td class="t-cell"><div class="tile${p?' ok':''}" onclick="toggleCell('${esc(g)}','${esc(cp)}')">
-        <div class="t-ico">${p?'✅':'　'}</div><div class="t-time">${p?S.records[g][cp]:''}</div>
-      </div></td>`;
-    }).join('');
-    return `<tr class="${allOk?'all-ok':''}"><td class="col-g">${allOk?'✓ ':''}${g}</td>${cells}</tr>`;
-  }).join('');
-  const pct=total>0?Math.round(tot/total*100):0;
-  document.getElementById('ci-prog').textContent=`${tot}/${total} 通過（${pct}%）`;
-}
-async function toggleCell(g,cp){
-  if(!S.records[g]) S.records[g]={};
-  const already=S.records[g][cp];
-  const msg=already
-    ? `「${g}」の「${cp}」\n通過記録を取り消しますか？`
-    : `「${g}」が「${cp}」を通過しました？`;
-  if(!confirm(msg)) return;
-  const newTime = already ? null : new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
-  if(already){ delete S.records[g][cp]; }
-  else{ S.records[g][cp]=newTime; }
-  renderCheckin(); renderOverview();
-  // remove=取消 / add=通過記録 を明示して送る（冪等）
-  await api({ action:'toggle', eventId:S.eventId, group:g, cp:cp, op: already?'remove':'add' });
-}
-
-// ===== 一覧 =====
-function renderOverview(){
-  const cps=S.checkpoints, gs=S.groups;
-  document.getElementById('ov-hdr').innerHTML='<th>班</th>'+cps.map(cp=>`<th>${cp}</th>`).join('');
-  let tot=0,okCnt=0,ngCnt=0;
-  const rows=gs.map(g=>{
-    const allOk=cps.length>0&&cps.every(cp=>S.records[g]&&S.records[g][cp]);
-    allOk?okCnt++:ngCnt++;
-    cps.forEach(cp=>{ if(S.records[g]&&S.records[g][cp]) tot++; });
-    return {g,allOk};
+function showTab(name) {
+  activeTab = name;
+  document.querySelectorAll('#app > .page, #app > .ci-page').forEach(p => p.classList.toggle('active', p.id === 'page-' + name));
+  document.querySelectorAll('.tab').forEach(button => {
+    const active = button.dataset.tab === name;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
   });
-  document.getElementById('m-tot').textContent=tot;
-  document.getElementById('m-ok').textContent=okCnt;
-  document.getElementById('m-ng').textContent=ngCnt;
-  const f=S.filter;
-  const filtered=rows.filter(r=>f==='ok'?r.allOk:f==='ng'?!r.allOk&&cps.length>0:true);
-  const tbody=document.getElementById('ov-body');
-  if(!gs.length||!cps.length){
-    tbody.innerHTML=`<tr><td colspan="${cps.length+1}" class="empty-row">設定タブで班・CPを追加してください</td></tr>`; return;
-  }
-  tbody.innerHTML=filtered.map(({g,allOk})=>{
-    const cells=cps.map(cp=>{
-      const p=S.records[g]&&S.records[g][cp];
-      return `<td>${p?`<span class="pass">✓ ${S.records[g][cp]}</span>`:`<span class="fail">✗</span>`}</td>`;
-    }).join('');
-    return `<tr><td style="font-weight:${allOk?700:400};white-space:nowrap"><span class="dot ${allOk?'ok2':'ng'}"></span>${g}</td>${cells}</tr>`;
-  }).join('');
+  renderChat();
+  updateUnread();
 }
-function setFilter(f){
-  S.filter=f;
-  ['all','ok','ng'].forEach(k=>document.getElementById('f-'+k).classList.toggle('active',k===f));
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+function recordAt(id, cp) {
+  const owns = (obj, key) => obj && Object.prototype.hasOwnProperty.call(obj, key);
+  return owns(S.records, id) && owns(S.records[id], cp) ? String(S.records[id][cp]) : '';
+}
+function cellKey(id, cp) { return JSON.stringify([id, cp]); }
+function renderCheckin() {
+  const cps = S.checkpoints, groups = S.groups;
+  const counts = cps.map(cp => groups.filter(g => recordAt(g.id, cp)).length);
+  el('ci-hdr').innerHTML = '<th class="col-g" scope="col">班</th>' + cps.map((cp, j) =>
+    '<th class="col-cp" scope="col"><div class="cp-th-name">' + escapeHtml(cp) + '</div><div class="cp-th-cnt">' + counts[j] + '/' + groups.length + '班</div></th>').join('');
+  const total = groups.length * cps.length;
+  const num = counts.reduce((a,b) => a+b, 0);
+  el('ci-prog').textContent = total ? num + '/' + total + ' 通過（' + Math.round(num/total*100) + '%）' : '';
+  if (!total) {
+    el('ci-body').innerHTML = '<tr><td class="empty-row" colspan="' + (cps.length+1) + '">設定でチェックポイントと班を登録してください。</td></tr>';
+    return;
+  }
+  const focus = document.activeElement;
+  const restore = focus?.matches('#ci-body button') ? [focus.dataset.id,focus.dataset.cp] : null;
+  el('ci-body').innerHTML = groups.map(g => {
+    const all = cps.every(cp => recordAt(g.id, cp));
+    const cells = cps.map(cp => {
+      const time = recordAt(g.id, cp);
+      const busy = busyCells.has(cellKey(g.id, cp)) || resetting;
+      const title = g.name + '・' + cp + (time ? ' 通過済み ' + time + '、取り消す' : ' 未通過、通過を記録');
+      return '<td class="t-cell"><button type="button" class="tile' + (time ? ' ok' : '') + '" data-id="' + escapeHtml(g.id) +
+        '" data-cp="' + escapeHtml(cp) + '" aria-label="' + escapeHtml(title) + '" aria-pressed="' + Boolean(time) + '"' +
+        (busy ? ' disabled' : '') + '><span class="t-ico" aria-hidden="true">' + (busy ? '…' : time ? '✓' : '—') +
+        '</span><span class="t-time">' + (busy ? '反映中' : time ? escapeHtml(time) : '未通過') + '</span></button></td>';
+    }).join('');
+    return '<tr class="' + (all?'all-ok':'') + '"><th class="col-g" scope="row">' + (all?'✓ ':'') + escapeHtml(g.name) + '</th>' + cells + '</tr>';
+  }).join('');
+  if (restore) {
+    const match = Array.from(el('ci-body').querySelectorAll('button')).find(b => b.dataset.id === restore[0] && b.dataset.cp === restore[1]);
+    if (match && !match.disabled) match.focus({preventScroll:true});
+  }
+}
+async function toggleCell(id, cp) {
+  const key = cellKey(id, cp);
+  if (busyCells.has(key) || resetting) return;
+  const op = recordAt(id, cp) ? 'remove' : 'add';
+  busyCells.add(key); renderCheckin(); el('checkin-msg').textContent = '';
+  try {
+    await api({action:'toggle', eventId:S.eventId, group:id, cp, op});
+    await fetchState();
+  } catch (err) { el('checkin-msg').textContent = err.message; await fetchState(); }
+  finally { busyCells.delete(key); renderCheckin(); }
+}
+
+function renderOverview() {
+  const cps = S.checkpoints;
+  el('ov-hdr').innerHTML = '<th scope="col">班</th>' + cps.map(cp => '<th scope="col">' + escapeHtml(cp) + '</th>').join('');
+  let passed = 0, finished = 0;
+  const rows = [];
+  for (const g of S.groups) {
+    const times = cps.map(cp => recordAt(g.id, cp));
+    const count = times.filter(Boolean).length;
+    const all = cps.length > 0 && count === cps.length;
+    passed += count; if (all) finished++;
+    if ((S.filter === 'ok' && !all) || (S.filter === 'ng' && all)) continue;
+    const cells = times.map(t => t ? '<td><span class="pass">✓ ' + escapeHtml(t) + '</span></td>' : '<td><span class="fail" aria-label="未通過">−</span></td>').join('');
+    rows.push('<tr><th scope="row"><span class="dot ' + (all?'ok2':'ng') + '"></span>' + escapeHtml(g.name) + '</th>' + cells + '</tr>');
+  }
+  el('m-tot').textContent = passed; el('m-ok').textContent = finished; el('m-ng').textContent = S.groups.length-finished;
+  const missingConfig = !S.groups.length || !cps.length;
+  el('ov-body').innerHTML = !missingConfig && rows.length ? rows.join('') : '<tr><td class="empty-row" colspan="' +
+    (1+cps.length) + '">' + (missingConfig ? '設定でチェックポイントと班を登録してください。' : '該当する班はありません。') + '</td></tr>';
+}
+function setFilter(value) {
+  S.filter = value;
+  ['all','ok','ng'].forEach(v => {
+    el('f-'+v).classList.toggle('active', v === value);
+    el('f-'+v).setAttribute('aria-pressed', String(v === value));
+  });
   renderOverview();
 }
-function copyText(){
-  const cps=S.checkpoints,gs=S.groups;
-  let t=(S.eventName||'通過記録')+'\n'+new Date().toLocaleString('ja-JP')+'\n\n';
-  t+='班\t'+cps.join('\t')+'\n';
-  gs.forEach(g=>{ t+=g+'\t'+cps.map(cp=>S.records[g]&&S.records[g][cp]?'○ '+S.records[g][cp]:'✗').join('\t')+'\n'; });
-  navigator.clipboard.writeText(t).then(()=>alert('コピーしました')).catch(()=>prompt('コピー:',t));
+function copyText() {
+  const rows = S.groups.map(g => [g.name, ...S.checkpoints.map(cp => recordAt(g.id, cp) ? '○ ' + recordAt(g.id, cp) : '未通過')]);
+  const table = [['班', ...S.checkpoints], ...rows].map(row => row.join('\t')).join('\n');
+  return copyValue([S.eventName, new Date().toLocaleString('ja-JP', {timeZone:'Asia/Tokyo'}), '', table].join('\n'), '通過一覧をコピーしました。');
 }
-async function doReset(){
-  if(!confirm('通過記録をすべてリセットしますか？')) return;
-  await api({ action:'reset', eventId:S.eventId });
+async function doReset() {
+  if (resetting || busyCells.size || !confirm('この行事の全班の通過記録をリセットしますか？ チャットと設定は残ります。')) return;
+  resetting = true; el('reset-btn').disabled = true; renderCheckin();
+  try { await api({action:'reset',eventId:S.eventId}); }
+  catch (err) { alert(err.message); }
+  finally { await fetchState(); resetting = false; el('reset-btn').disabled = false; renderCheckin(); }
+}
+
+function renderAll() {
+  el('hdr-title').textContent = S.eventName;
+  renderSetup();
+  const sig = JSON.stringify([S.checkpoints, S.groups, S.records]);
+  if (sig !== viewSignature) {
+    viewSignature = sig; renderCheckin(); renderOverview(); renderDuty();
+  }
+  renderChat(); updateUnread();
+}
+
+async function boot() {
+  document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+  el('ci-body').addEventListener('click', event => {
+    const b = event.target.closest('button[data-id]');
+    if (b && !b.disabled) toggleCell(b.dataset.id, b.dataset.cp);
+  });
+  el('sync-badge').addEventListener('click', pollNow);
+  window.addEventListener('online', pollNow);
+  window.addEventListener('offline', () => { if (live) showSync(false); });
+  document.addEventListener('visibilitychange', () => document.hidden ? clearTimeout(polling) : pollNow());
+  const eid = new URLSearchParams(location.search).get('event');
+  const fallback = new URL('legacy.html', location.href);
+  if (eid) fallback.searchParams.set('event', eid);
+  el('legacy-help').href = fallback.href;
+  disableEntry(true);
+  el('top-msg').textContent = '接続先を確認中…';
+  try {
+    const capability = await readApi({action:'capabilities'});
+    if (!capability.ok && /unknown action|不明な(操作|アクション)/i.test(capability.error || '')) {
+      location.replace(fallback.href);
+      return;
+    }
+    if (!capability.ok || capability.version !== 4) throw new Error('接続先のバージョンを確認できませんでした。');
+    el('top-msg').textContent = '';
+  } catch (err) {
+    el('top-msg').textContent = err.message;
+    el('legacy-help').hidden = false;
+  } finally { disableEntry(false); }
+  if (eid) enterApp(eid.trim().toLowerCase());
+}
+
+let setupDraft = null;
+let setupSaving = false;
+let setupConflict = false;
+
+function setupEl(id) {
+  return document.getElementById(id);
+}
+
+function setupNotice(message) {
+  setupEl('setup-msg').textContent = message;
+}
+
+function setupUpdateControls() {
+  setupEl('setup-fields').disabled = !setupDraft || setupSaving;
+  setupEl('setup-save').disabled = setupConflict;
+  setupEl('setup-conflict').hidden = !setupConflict;
+}
+
+function setupMarkEdited() {
+  if (!setupDraft || setupSaving) return;
+  setupDraft.edited = true;
+  setupNotice('変更した設定は「設定を保存」で共有できます。');
+}
+
+function setupLoadCurrent() {
+  const changedEvent = !setupDraft || setupDraft.eventId !== S.eventId;
+  setupDraft = {
+    eventId: S.eventId,
+    version: S.configVersion,
+    checkpoints: S.checkpoints.slice(),
+    groups: S.groups.map(({id, name}) => ({id, name})),
+    edited: false
+  };
+  setupConflict = false;
+  setupEl('inp-event').value = S.eventName;
+  if (changedEvent) {
+    ['inp-cp','inp-group','inp-cn','inp-gn'].forEach(id => { setupEl(id).value = ''; });
+    setupNotice('');
+  }
+  setupRenderCheckpoints();
+  setupRenderGroups();
+  setupUpdateControls();
+}
+
+// ポーリングで入力中の班名や行事名を書き戻さない。
+function renderSetup() {
+  if (!S.eventId || !Number.isInteger(S.configVersion) || setupSaving) return;
+  if (!setupDraft || setupDraft.eventId !== S.eventId) {
+    setupLoadCurrent();
+  } else if (S.configVersion > setupDraft.version) {
+    if (setupDraft.edited) {
+      setupConflict = true;
+      setupUpdateControls();
+    } else {
+      setupLoadCurrent();
+    }
+  }
+}
+
+function setupInputError(input, message) {
+  setupNotice(message);
+  input.focus();
+  input.setCustomValidity(message);
+  input.reportValidity();
+  input.setCustomValidity('');
+}
+
+function setupEmpty(text) {
+  const span = document.createElement('span');
+  span.className = 'setup-empty';
+  span.textContent = text;
+  return span;
+}
+
+function setupRemoveButton(label, className, remove) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = className;
+  button.setAttribute('aria-label', label);
+  button.title = label;
+  button.textContent = '×';
+  button.addEventListener('click', remove);
+  return button;
+}
+
+function setupRenderCheckpoints() {
+  const target = setupEl('cp-tags');
+  target.replaceChildren();
+  for (const name of setupDraft.checkpoints) {
+    const tag = document.createElement('span');
+    tag.className = 'tag';
+    tag.textContent = name;
+    tag.append(setupRemoveButton(name + 'を削除', 'tag-x', () => {
+      setupDraft.checkpoints = setupDraft.checkpoints.filter(cp => cp !== name);
+      setupMarkEdited();
+      setupRenderCheckpoints();
+    }));
+    target.append(tag);
+  }
+  if (!setupDraft.checkpoints.length) target.append(setupEmpty('チェックポイントはまだありません。'));
+}
+
+function setupRenderGroups() {
+  const target = setupEl('group-tags');
+  target.replaceChildren();
+  for (const group of setupDraft.groups) {
+    const row = document.createElement('div');
+    row.className = 'setup-group-row';
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.maxLength = 80;
+    input.value = group.name;
+    input.setAttribute('aria-label', '班名（' + group.name + '）');
+    const remove = setupRemoveButton(group.name + 'を削除', 'setup-remove', () => {
+      setupDraft.groups = setupDraft.groups.filter(g => g.id !== group.id);
+      setupMarkEdited();
+      setupRenderGroups();
+    });
+    input.addEventListener('input', () => {
+      group.name = input.value;
+      remove.setAttribute('aria-label', group.name + 'を削除');
+      remove.title = group.name + 'を削除';
+      setupMarkEdited();
+    });
+    row.append(input, remove);
+    target.append(row);
+  }
+  setupEl('setup-group-count').textContent = setupDraft.groups.length + '班';
+  if (!setupDraft.groups.length) target.append(setupEmpty('班はまだありません。'));
+}
+
+function addCP() {
+  const input = setupEl('inp-cp');
+  const name = input.value.trim();
+  if (!name) return setupInputError(input, 'チェックポイントの名前を入力してください。');
+  if (setupDraft.checkpoints.includes(name)) return setupInputError(input, '同じチェックポイントがあります。');
+  if (setupDraft.checkpoints.length >= 200) return setupInputError(input, 'チェックポイントは200件までです。');
+  setupDraft.checkpoints.push(name);
+  input.value = '';
+  setupMarkEdited();
+  setupRenderCheckpoints();
+  input.focus();
+}
+
+function addGroup() {
+  const input = setupEl('inp-group');
+  const name = input.value.trim();
+  if (!name) return setupInputError(input, '班名を入力してください。');
+  if (setupDraft.groups.some(g => g.name.trim() === name)) return setupInputError(input, '同じ名前の班があります。');
+  if (setupDraft.groups.length >= 400) return setupInputError(input, '班は400件までです。');
+  setupDraft.groups.push({id: makeId(), name});
+  input.value = '';
+  setupMarkEdited();
+  setupRenderGroups();
+  input.focus();
+}
+
+function bulkGroups() {
+  const classes = setupEl('inp-cn');
+  const teams = setupEl('inp-gn');
+  for (const input of [classes, teams]) {
+    if (!Number.isInteger(input.valueAsNumber) || input.valueAsNumber < 1 || input.valueAsNumber > 400) {
+      return setupInputError(input, '1から400までの整数を入力してください。');
+    }
+  }
+  if (classes.valueAsNumber * teams.valueAsNumber > 400) return setupInputError(teams, '班の合計が400件以内になるように入力してください。');
+  const names = new Set(setupDraft.groups.map(g => g.name.trim()));
+  const additions = [];
+  for (let c = 1; c <= classes.valueAsNumber; c++) {
+    for (let g = 1; g <= teams.valueAsNumber; g++) {
+      const name = c + '組' + g + '班';
+      if (!names.has(name)) additions.push(name);
+    }
+  }
+  if (!additions.length) return setupNotice('入力した組と班は、すべて追加済みです。');
+  if (setupDraft.groups.length + additions.length > 400) return setupInputError(teams, '登録済みの班と合わせて400件以内にしてください。');
+  for (const name of additions) setupDraft.groups.push({id: makeId(), name});
+  setupMarkEdited();
+  setupRenderGroups();
+  setupNotice(additions.length + '班を追加しました。「設定を保存」で共有できます。');
+}
+
+async function saveConfig() {
+  if (!setupDraft || setupSaving || setupConflict) return;
+  const input = setupEl('inp-event');
+  const eventName = input.value.trim();
+  if (!eventName) return setupInputError(input, '行事名を入力してください。');
+  if (!setupDraft.checkpoints.length) return setupInputError(setupEl('inp-cp'), 'チェックポイントを1つ以上追加してください。');
+  if (!setupDraft.groups.length) return setupInputError(setupEl('inp-group'), '班を1つ以上追加してください。');
+  const names = new Set();
+  const groups = setupDraft.groups.map(({id, name}) => ({id, name: name.trim()}));
+  for (let i = 0; i < groups.length; i++) {
+    const name = groups[i].name;
+    if (!name || names.has(name)) {
+      return setupInputError(setupEl('group-tags').querySelectorAll('input')[i],
+        name ? '班名が重複しています。別の名前に変更してください。' : '班名を入力してください。');
+    }
+    names.add(name);
+  }
+  if (!setupDraft.edited) return setupNotice('現在の設定は保存されています。');
+
+  setupSaving = true;
+  setupUpdateControls();
+  setupNotice('保存中…');
+  try {
+    const result = await api({
+      action: 'saveConfig', eventId: setupDraft.eventId, eventName,
+      checkpoints: setupDraft.checkpoints.slice(), groups, configVersion: setupDraft.version
+    });
+    setupDraft.edited = false;
+    setupDraft.version = result.configVersion;
+    setupDraft.groups = groups;
+    input.value = eventName;
+    setupRenderGroups();
+    setupNotice('設定を保存しました。');
+  } catch (error) {
+    if (error.code === 'CONFIG_CONFLICT') setupConflict = true;
+    setupNotice(error.message || '保存できませんでした。通信状況を確認してもう一度お試しください。');
+  } finally {
+    setupSaving = false;
+    setupUpdateControls();
+  }
   await fetchState();
 }
 
-// ===== 共有 =====
-function shareUrl(){
-  const url=location.origin+location.pathname+'?event='+S.eventId;
-  if(navigator.share){ navigator.share({ title:S.eventName||'CP通過管理', url }); }
-  else{ navigator.clipboard.writeText(url).then(()=>alert('URLをコピーしました！')); }
-}
-
-// ===== 全体再描画 =====
-function renderAll(){
-  document.getElementById('hdr-title').textContent=S.eventName||'（未設定）';
-  // 設定タブが表示中は入力内容を上書きしない
-  const setupActive=document.getElementById('page-setup').classList.contains('active');
-  if(!setupActive){
-    tCPs=[...S.checkpoints]; tGrps=[...S.groups];
-    const evInp=document.getElementById('inp-event');
-    evInp.value=S.eventName;
-    renderTags();
+async function reloadSetup() {
+  if (setupSaving || !setupDraft) return;
+  if (!confirm('この端末の未保存の編集を破棄して、最新の設定を読み込みますか？')) return;
+  await fetchState();
+  if (S.configVersion > setupDraft.version) {
+    setupLoadCurrent();
+    setupNotice('最新の設定を読み込みました。');
+  } else {
+    setupNotice('最新の設定を確認できませんでした。通信状況を確認してもう一度お試しください。');
   }
-  renderCheckin(); renderOverview();
 }
 
-function esc(s){ return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+// 作成前の班IDを保持し、名称を編集したときもそのままサーバーに送る。
+function createNotice(text) {
+  el('create-config-status').textContent = text;
+}
+function createError(input, message) {
+  el('create-details').open = true;
+  input.focus();
+  input.setCustomValidity(message);
+  input.reportValidity();
+  input.setCustomValidity('');
+  createNotice(message);
+}
+function appendCreateGroup(name) {
+  const row = document.createElement('div');
+  row.className = 'row';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.maxLength = 80;
+  input.dataset.id = makeId();
+  input.value = name;
+  input.setAttribute('aria-label', name + 'の班名');
+  const remove = setupRemoveButton(name + 'を削除', 'create-remove', () => {
+    row.remove();
+    createNotice('班を削除しました。');
+  });
+  input.addEventListener('change', () => {
+    const label = input.value.trim() || 'この班';
+    input.setAttribute('aria-label', label + 'の班名');
+    remove.setAttribute('aria-label', label + 'を削除');
+    remove.title = label + 'を削除';
+  });
+  row.append(input, remove);
+  el('create-groups').append(row);
+}
+function createGroupInputs() {
+  return Array.from(el('create-groups').querySelectorAll('input'));
+}
+
+el('create-cp-form').addEventListener('submit', event => {
+  event.preventDefault();
+  const input = el('create-cp'), name = input.value.trim();
+  const items = Array.from(el('create-cps').children);
+  if (!name) return createError(input, 'チェックポイントの名前を入力してください。');
+  if (items.some(item => item.dataset.name === name)) return createError(input, '同じチェックポイントがあります。');
+  if (items.length >= 200) return createError(input, 'チェックポイントは200件までです。');
+  const tag = document.createElement('span');
+  tag.className = 'tag';
+  tag.dataset.name = name;
+  tag.textContent = name;
+  tag.append(setupRemoveButton(name + 'を削除', 'tag-x', () => {
+    tag.remove();
+    createNotice('チェックポイントを削除しました。');
+  }));
+  el('create-cps').append(tag);
+  input.value = '';
+  createNotice(name + 'を追加しました。');
+  input.focus();
+});
+
+el('create-group-form').addEventListener('submit', event => {
+  event.preventDefault();
+  const input = el('create-group'), name = input.value.trim();
+  const groups = createGroupInputs();
+  if (!name) return createError(input, '班名を入力してください。');
+  if (groups.some(group => group.value.trim() === name)) return createError(input, '同じ名前の班があります。');
+  if (groups.length >= 400) return createError(input, '班は400件までです。');
+  appendCreateGroup(name);
+  input.value = '';
+  createNotice(name + 'を追加しました。');
+  input.focus();
+});
+
+el('create-bulk-form').addEventListener('submit', event => {
+  event.preventDefault();
+  const classCount = el('create-classes').valueAsNumber;
+  const teamCount = el('create-teams').valueAsNumber;
+  if (![classCount,teamCount].every(n => Number.isInteger(n) && n >= 1 && n <= 400) || classCount * teamCount > 400) {
+    return createError(el('create-teams'), '班の合計が400以内になるように整数を入力してください。');
+  }
+  const groups = createGroupInputs();
+  const names = new Set(groups.map(input => input.value.trim()));
+  const additions = [];
+  for (let c = 1; c <= classCount; c++) {
+    for (let g = 1; g <= teamCount; g++) {
+      const name = c + '組' + g + '班';
+      if (!names.has(name)) additions.push(name);
+    }
+  }
+  if (groups.length + additions.length > 400) return createError(el('create-teams'), '登録済みの班と合わせて400班までです。');
+  additions.forEach(appendCreateGroup);
+  el('create-classes').value = '';
+  el('create-teams').value = '';
+  createNotice(additions.length ? additions.length + '班を追加しました。班名はそのまま編集できます。' : '入力した組・班はすべて追加済みです。');
+});
+
+function readCreateConfig() {
+  for (const [id, message] of [
+    ['create-cp','入力中のチェックポイントは「追加」を押してください。'],
+    ['create-group','入力中の班は「追加」を押してください。'],
+    ['create-classes','組の数と各組の班数を入力して「班をまとめて追加」を押してください。'],
+    ['create-teams','組の数と各組の班数を入力して「班をまとめて追加」を押してください。']
+  ]) {
+    const input = el(id);
+    if (input.value.trim()) { createError(input, message); throw new Error(message); }
+  }
+  const names = new Set();
+  const groups = createGroupInputs().map(input => {
+    const name = input.value.trim();
+    if (!name || names.has(name)) {
+      const message = !name ? '班名を入力してください。' : '同じ班名があります。名前を変更してください。';
+      createError(input, message);
+      throw new Error(message);
+    }
+    names.add(name);
+    return {id:input.dataset.id, name};
+  });
+  return {checkpoints:Array.from(el('create-cps').children, tag => tag.dataset.name), groups};
+}
+
+// 名前は行事ごとにこの端末に保存する。送信結果待ちの投稿はタブごとに覚えておく。
+const participantNames = new Map();
+const identityDialog = document.getElementById('identity-dialog');
+const identityInput = document.getElementById('identity-input');
+let identityPrompt = null;
+let identityImeEnter = false;
+
+function getParticipantName() {
+  if (!S.eventId) return '';
+  if (!participantNames.has(S.eventId)) {
+    let saved = '';
+    try { saved = (localStorage.getItem('cp:name:' + S.eventId) || '').trim(); } catch (_) {}
+    participantNames.set(S.eventId, saved.length <= 24 ? saved : '');
+  }
+  return participantNames.get(S.eventId);
+}
+
+function displayParticipantName() {
+  const button = document.getElementById('participant-name');
+  const name = getParticipantName();
+  button.textContent = name || '名前を入力';
+  button.setAttribute('aria-label', name ? '参加者名を変更（現在：' + name + '）' : '参加者名を入力');
+  button.title = name ? name + '（名前を変更）' : '参加者名を入力';
+}
+
+function openParticipantDialog() {
+  if (identityPrompt) return identityPrompt.promise;
+  const currentName = getParticipantName();
+  let resolvePrompt;
+  const promise = new Promise(resolve => { resolvePrompt = resolve; });
+  identityPrompt = {eventId: S.eventId, promise, resolve: resolvePrompt};
+  document.getElementById('identity-title').textContent = currentName ? '参加者名を変更' : '参加する名前を入力';
+  document.getElementById('identity-submit').textContent = currentName ? '変更する' : '参加する';
+  document.getElementById('identity-error').textContent = '';
+  identityInput.value = currentName;
+  identityDialog.showModal();
+  identityInput.focus();
+  if (currentName) identityInput.select();
+  return promise;
+}
+
+async function ensureParticipantName() {
+  displayParticipantName();
+  return Boolean(getParticipantName()) || openParticipantDialog();
+}
+
+function changeParticipantName() {
+  return openParticipantDialog();
+}
+
+function finishParticipantDialog(accepted) {
+  const prompt = identityPrompt;
+  if (!prompt) return;
+  identityPrompt = null;
+  identityDialog.close();
+  prompt.resolve(accepted);
+}
+
+document.getElementById('identity-form').addEventListener('submit', event => {
+  event.preventDefault();
+  if (identityImeEnter) return;
+  const name = identityInput.value.trim();
+  if (!name || name.length > 24) {
+    document.getElementById('identity-error').textContent = '名前を1〜24文字で入力してください。';
+    identityInput.focus();
+    return;
+  }
+  if (!identityPrompt || identityPrompt.eventId !== S.eventId) {
+    finishParticipantDialog(false);
+    return;
+  }
+  participantNames.set(S.eventId, name);
+  try { localStorage.setItem('cp:name:' + S.eventId, name); } catch (_) {}
+  displayParticipantName();
+  finishParticipantDialog(true);
+});
+identityDialog.addEventListener('cancel', event => {
+  event.preventDefault();
+  finishParticipantDialog(false);
+});
+document.getElementById('identity-cancel').addEventListener('click', () => finishParticipantDialog(false));
+identityInput.addEventListener('keydown', event => {
+  if (event.key === 'Enter' && (event.isComposing || event.keyCode === 229)) {
+    identityImeEnter = true;
+    setTimeout(() => { identityImeEnter = false; }, 0);
+  }
+});
+
+const chatInput = document.getElementById('chat-text');
+const chatHistory = document.getElementById('chat-history');
+const chatList = document.getElementById('chat-messages');
+const chatJump = document.getElementById('chat-jump');
+const chatClock = new Intl.DateTimeFormat('ja-JP', {
+  month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit', hourCycle:'h23', timeZone:'Asia/Tokyo'
+});
+let chatEventId = '';
+let chatPending = null;
+let chatSending = false;
+
+function showChatStatus(text, error = false) {
+  const status = document.getElementById('chat-status');
+  status.textContent = text;
+  status.classList.toggle('chat-error', error);
+}
+
+function updateChatButton() {
+  const send = document.getElementById('chat-send');
+  send.disabled = chatSending || !chatInput.value.trim();
+  send.textContent = chatSending ? '送信中…' : '送信';
+  chatInput.readOnly = chatSending;
+}
+
+function rememberPendingChat(post) {
+  chatPending = post;
+  const key = 'cp:pending-chat:' + chatEventId;
+  try {
+    if (post) sessionStorage.setItem(key, JSON.stringify(post));
+    else sessionStorage.removeItem(key);
+  } catch (_) {}
+}
+
+function initChatForEvent() {
+  if (chatEventId === S.eventId) return;
+  chatEventId = S.eventId;
+  chatPending = null;
+  chatSending = false;
+  chatInput.value = '';
+  chatList.replaceChildren();
+  chatJump.hidden = true;
+  showChatStatus('');
+  try {
+    const post = JSON.parse(sessionStorage.getItem('cp:pending-chat:' + chatEventId));
+    if (post && typeof post.id === 'string' && typeof post.name === 'string' && typeof post.text === 'string') {
+      chatPending = post;
+      chatInput.value = post.text;
+      showChatStatus('前回の送信を確認中です。必要に応じて再送できます。');
+    }
+  } catch (_) {}
+  updateChatButton();
+}
+
+function confirmPendingChat() {
+  if (chatInput.value.trim() === chatPending.text) chatInput.value = '';
+  rememberPendingChat(null);
+  showChatStatus('送信しました。');
+  updateChatButton();
+}
+
+function chatMessageItem(message) {
+  const item = document.createElement('li');
+  item.dataset.id = message.id;
+  const meta = document.createElement('div');
+  meta.className = 'chat-meta';
+  const sender = document.createElement('strong');
+  sender.textContent = message.name;
+  const time = document.createElement('time');
+  time.dateTime = message.at;
+  const stamp = new Date(message.at);
+  if (Number.isFinite(stamp.getTime())) time.textContent = chatClock.format(stamp);
+  meta.append(sender, time);
+  const body = document.createElement('p');
+  body.className = 'chat-body';
+  body.textContent = message.text;
+  item.append(meta, body);
+  return item;
+}
+
+function atChatBottom() {
+  return chatHistory.scrollHeight - chatHistory.clientHeight - chatHistory.scrollTop < 32;
+}
+
+function scrollChatToEnd() {
+  chatHistory.scrollTop = chatHistory.scrollHeight;
+  chatJump.hidden = true;
+}
+
+function renderChat() {
+  initChatForEvent();
+  const messages = S.messages || [];
+  if (chatPending && messages.some(message => message.id === chatPending.id)) confirmPendingChat();
+  if (!document.getElementById('page-chat').classList.contains('active')) return;
+
+  const oldItems = Array.from(chatList.children);
+  const same = oldItems.length === messages.length && oldItems.every((item, i) => item.dataset.id === messages[i].id);
+  document.getElementById('chat-empty').hidden = messages.length !== 0;
+  document.getElementById('chat-limit').hidden = messages.length < 100;
+  if (same) return;
+
+  const follow = oldItems.length === 0 || atChatBottom();
+  const ids = new Set(messages.map(message => message.id));
+  const top = chatHistory.getBoundingClientRect().top;
+  const anchor = follow ? null : oldItems.find(item => ids.has(item.dataset.id) && item.getBoundingClientRect().bottom > top);
+  const oldY = anchor && anchor.getBoundingClientRect().top;
+
+  const existing = new Map(oldItems.map(item => [item.dataset.id, item]));
+  oldItems.filter(item => !ids.has(item.dataset.id)).forEach(item => item.remove());
+  messages.forEach((message, index) => {
+    const item = existing.get(message.id) || chatMessageItem(message);
+    if (chatList.children[index] !== item) chatList.insertBefore(item, chatList.children[index] || null);
+  });
+  if (follow) scrollChatToEnd();
+  else {
+    if (anchor) chatHistory.scrollTop += anchor.getBoundingClientRect().top - oldY;
+    chatJump.hidden = atChatBottom();
+  }
+}
+
+chatJump.addEventListener('click', scrollChatToEnd);
+chatHistory.addEventListener('scroll', () => { if (atChatBottom()) chatJump.hidden = true; });
+chatInput.addEventListener('input', updateChatButton);
+document.getElementById('chat-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  if (chatSending) return;
+  const text = chatInput.value.trim();
+  if (!text || text.length > 300) {
+    showChatStatus('メッセージを1〜300文字で入力してください。', true);
+    return;
+  }
+  if (!(await ensureParticipantName()) || chatSending) return;
+  const eventId = S.eventId;
+  // 名前を変更していても、通信結果が不明のまま同じ投稿を再送する場合は元の内容とIDを保つ。
+  const post = chatPending && chatPending.text === text ? chatPending : {id: makeId(), name: getParticipantName(), text};
+  rememberPendingChat(post);
+  chatSending = true;
+  updateChatButton();
+  showChatStatus('');
+  try {
+    const response = await api({action:'sendMessage', eventId, ...post});
+    if (S.eventId !== eventId) return;
+    if (!response.ok) throw new Error(response.error || '送信エラー');
+    if (response.message && !(S.messages || []).some(message => message.id === post.id)) {
+      S.messages = [...(S.messages || []), response.message].sort((a,b) => a.at.localeCompare(b.at)).slice(-100);
+    }
+    if (chatPending && chatPending.id === post.id) confirmPendingChat();
+    renderChat();
+    scrollChatToEnd();
+  } catch (error) {
+    if (S.eventId === eventId && chatPending && chatPending.id === post.id) {
+      showChatStatus('送信結果を確認できませんでした。入力は残っています。もう一度「送信」を押してください。', true);
+    }
+  } finally {
+    if (S.eventId === eventId) {
+      chatSending = false;
+      updateChatButton();
+    }
+  }
+  if (S.eventId === eventId) fetchState().catch(() => {});
+});
+
+let dutyEventId = '';
+let dutyOptions = '';
+let dutySummary = '';
+
+function renderDuty() {
+  const select = document.getElementById('duty-cp');
+  const sameEvent = dutyEventId === S.eventId;
+  const optionsKey = JSON.stringify(S.checkpoints);
+  if (!sameEvent || optionsKey !== dutyOptions) {
+    const previous = sameEvent ? select.value : '';
+    select.replaceChildren(new Option('全チェックポイント', ''));
+    for (const cp of S.checkpoints) select.add(new Option(cp, cp));
+    select.value = S.checkpoints.includes(previous) ? previous : '';
+    dutyEventId = S.eventId;
+    dutyOptions = optionsKey;
+    dutySummary = '';
+  }
+  const cp = select.value;
+  document.getElementById('duty-result').hidden = !cp;
+  if (!cp) return;
+
+  const missing = [];
+  for (const group of S.groups) {
+    const record = Object.prototype.hasOwnProperty.call(S.records, group.id) && S.records[group.id];
+    if (!(record && Object.prototype.hasOwnProperty.call(record, cp) && record[cp])) {
+      missing.push(group.name);
+    }
+  }
+  const passed = S.groups.length - missing.length;
+  const summaryKey = JSON.stringify([cp, passed, missing]);
+  if (summaryKey === dutySummary) return;
+  dutySummary = summaryKey;
+
+  document.getElementById('duty-count').textContent = '通過 ' + passed + '班 ／ 未通過 ' + missing.length + '班';
+  document.getElementById('duty-missing').hidden = missing.length === 0;
+  const list = document.getElementById('duty-groups');
+  list.replaceChildren();
+  for (const name of missing) {
+    const item = document.createElement('li');
+    item.textContent = name;
+    list.append(item);
+  }
+}
+
+// 未読位置はこのタブ・行事ごとに記憶する。初参加時は、その時点の投稿までを既読とする。
+const unreadCursors = new Map();
+
+function rememberChatCursor(eventId, id) {
+  if (unreadCursors.get(eventId) === id) return;
+  unreadCursors.set(eventId, id);
+  try { sessionStorage.setItem('cp:chat-read:' + eventId, id); } catch (_) {}
+}
+
+function updateUnread() {
+  const badge = document.getElementById('unread-badge');
+  if (!badge) return;
+  let count = 0;
+  if (live && S.eventId) {
+    const messages = S.messages || [];
+    const latest = messages.length ? messages[messages.length - 1].id : '';
+    if (!unreadCursors.has(S.eventId)) {
+      let saved = null;
+      try { saved = sessionStorage.getItem('cp:chat-read:' + S.eventId); } catch (_) {}
+      if (saved === null) rememberChatCursor(S.eventId, latest);
+      else unreadCursors.set(S.eventId, saved);
+    }
+    if (activeTab === 'chat' && !document.hidden) {
+      rememberChatCursor(S.eventId, latest);
+    } else {
+      const cursor = unreadCursors.get(S.eventId);
+      const index = messages.findIndex(message => message.id === cursor);
+      // 既読位置が最新100件の範囲外なら、画面に届いている全件が未読。
+      count = messages.length - index - 1;
+    }
+  }
+  badge.hidden = count === 0;
+  const label = count ? (count >= 100 ? '未読100件以上' : '未読' + count + '件') : '';
+  badge.textContent = count ? (count >= 100 ? '99+' : String(count)) : '';
+  badge.setAttribute('aria-label', label);
+  badge.title = label;
+}
+
+document.addEventListener('visibilitychange', updateUnread);
+boot();
 </script>
 </body>
-  <footer style="border-top: 0.5px solid #e0e0e0; padding: 1.5rem 0 1rem; text-align: center;"> <p style="font-size: 15px; color: #888; margin: 0 0 4px;">「あったらいいのに」を、作ってる。</p> <p style="font-size: 12px; color: #aaa; margin: 0;">© 2026 野村晃一 All rights reserved.</p> </footer> 
 </html>
