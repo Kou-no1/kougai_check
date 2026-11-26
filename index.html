@@ -389,10 +389,9 @@ input:focus-visible, textarea:focus-visible {
   </details>
   <button class="btn-create" id="btn-create" type="button" onclick="createFieldEvent()">イベントを作成</button>
 </section>
-  <form class="top-card" id="join-card" onsubmit="if (window.kougaiGuestForm &amp;&amp; window.kougaiGuestForm()) return true; event.preventDefault(); if (typeof joinEvent === 'function') { joinEvent(); } else { document.getElementById('join-status').textContent = '参加画面を起動できませんでした。QRを読み取ったアプリのメニューから、SafariまたはChromeで開き直してください。'; }">
+  <form class="top-card" id="join-card" onsubmit="event.preventDefault(); if (typeof joinEvent === 'function') { joinEvent(); } else { document.getElementById('join-status').textContent = '参加画面を起動できませんでした。SafariまたはChromeで開き直してください。'; if (window.showBasicJoinHelp) window.showBasicJoinHelp(); }">
     <h2 class="top-card-title" id="join-title">イベントに参加</h2>
     <p class="join-instruction" id="guest-join-help" hidden>主催者から届いた8文字の行事IDを入力してください。</p>
-    <input type="hidden" id="guest-form-view" value="guest">
     <label for="inp-join-id">行事ID</label>
     <input type="text" id="inp-join-id" maxlength="80" autocomplete="off" enterkeyhint="go" placeholder="例：abc12345" autocapitalize="none" spellcheck="false" required>
     <button class="btn-join" type="submit" id="join-button">参加する</button>
@@ -400,7 +399,7 @@ input:focus-visible, textarea:focus-visible {
     <noscript><p class="join-browser-note">参加にはJavaScriptが必要です。SafariまたはChromeで、この参加URLを開いてください。</p></noscript>
     <div id="qr-browser-help" hidden>
       <p>QRを読み取ったアプリのメニューからSafariまたはChromeで開くか、参加URLをコピーしてブラウザに貼り付けてください。</p>
-      <a id="open-join-url" target="_top" rel="noreferrer" hidden>外部参加用ページを開く</a>
+      <a id="open-join-url" target="_top" rel="noreferrer" hidden>参加ページを開き直す</a>
       <button type="button" id="copy-join-url" class="btn">参加URLをコピー</button>
       <input type="text" id="manual-join-url" aria-label="コピーする参加URL" readonly hidden>
       <p id="copy-join-status" role="status" aria-live="polite"></p>
@@ -596,60 +595,33 @@ input:focus-visible, textarea:focus-visible {
 </section>
 </div>
 <script>
-// QRリーダー内の古いブラウザでも最初の移動はできるよう、この部分はES5で書く。
+// QRリーダーの中で画面が起動しないときも、行事IDとコピー用のURLを残す。
 (function () {
   if (window.KOUGAI_HOSTED) return;
-  var config = document.querySelector('meta[name="guest-app-url"]');
-  var base = config && config.content;
-  if (!/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(base || '')) return;
-
-  function query(key) {
-    var item = new RegExp('(?:^|&)' + key + '=([^&]*)').exec(location.search.slice(1));
-    try { return item ? decodeURIComponent(item[1].replace(/\+/g, ' ')) : ''; }
-    catch (error) { return ''; }
+  var field = document.getElementById('inp-join-id');
+  var query = /(?:^|&)event=([^&]*)/.exec(location.search.slice(1));
+  if (query) {
+    try { field.value = decodeURIComponent(query[1].replace(/\+/g, ' ')); } catch (ignored) {}
   }
-  if (query('view') === 'teacher') return;
-
-  var form = document.getElementById('join-card');
-  var input = document.getElementById('inp-join-id');
-  var link = document.getElementById('open-join-url');
-  function eventId(value) {
-    if (String.prototype.normalize) value = value.normalize('NFKC');
-    else value = value.replace(/[０-９Ａ-Ｚａ-ｚ]/g, function (c) {
+  window.showBasicJoinHelp = function () {
+    var id = field.value.replace(/[０-９Ａ-Ｚａ-ｚ]/g, function (c) {
       return String.fromCharCode(c.charCodeAt(0) - 0xFEE0);
-    });
-    return value.replace(/\s+/g, '').toLowerCase();
-  }
-  // 通常のフォーム送信なら、埋め込み画面でもタップ時の権限で親画面を開ける。
-  window.kougaiGuestForm = function () {
-    var id = eventId(input.value);
-    if (!/^[a-z0-9]{8}$/.test(id)) return false;
-    form.action = base;
-    form.target = '_top';
-    form.method = 'get';
-    document.getElementById('guest-form-view').name = 'view';
-    input.name = 'event';
-    input.value = id;
-    return true;
+    }).replace(/\s+/g, '').toLowerCase();
+    var address = location.protocol + '//' + location.host + location.pathname + '?view=guest';
+    if (/^[a-z0-9]{8}$/.test(id)) address += '&event=' + id;
+    document.getElementById('qr-browser-help').hidden = false;
+    document.getElementById('copy-join-url').hidden = true;
+    var output = document.getElementById('manual-join-url');
+    output.value = address; output.hidden = false; output.focus(); output.select();
+    document.getElementById('copy-join-status').textContent = 'このURLをコピーしてSafariまたはChromeで開いてください。';
   };
-
-  var id = eventId(query('event'));
-  if (!/^[a-z0-9]{8}$/.test(id)) return;
-  input.value = id;
-  link.href = base + '?view=guest&event=' + id;
-  link.hidden = false;
-  document.getElementById('qr-browser-help').hidden = false;
-  document.getElementById('join-status').textContent = '参加ページを開きます。画面が変わらないときは「参加する」を押してください。';
-  window.kougaiQrHandoff = true;
-  if (window.self === window.top) {
-    try { location.replace(link.href); } catch (error) { /* 入力済みフォームからも参加できる。 */ }
-  }
 })();
 </script>
 <script>
 // このURLは、現在使用しているApps Scriptウェブアプリの /exec URL。
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwEHr5typEWu4A2nldXnV1VJMUMnCrwufTKAYPp3DM4rcy7SFChXD7xhWiddD4HRT4/exec';
 // Apps Script の HTML サービスが画面を返す場合だけ、この値が埋め込まれる。
+const productionGuestApi = 'https://script.google.com/macros/s/AKfycbwEHr5typEWu4A2nldXnV1VJMUMnCrwufTKAYPp3DM4rcy7SFChXD7xhWiddD4HRT4/exec';
 const hosted = window.KOUGAI_HOSTED || null;
 const requestedView = hosted ? hosted.view || 'app' : new URLSearchParams(location.search).get('view') || 'app';
 let guestScreen = requestedView === 'guest';
@@ -688,8 +660,29 @@ function checked(result) {
   throw err;
 }
 
-// 読み込みはJSONP。名前・本文などの書き込みデータはPOST本文で送る。
+function publicGuestEndpoint() {
+  return !hosted && guestScreen ? guestDeployment : '';
+}
+
+// 参加者のGoogleログイン状態を使わず、公開APIのJSONを読み込む。
+async function readGuestApi(base, params, timeout) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
+  try {
+    const query = new URLSearchParams({...params, v:'4', view:'guest'});
+    const response = await fetch(base + '?' + query, {
+      mode:'cors', credentials:'omit', cache:'no-store', referrerPolicy:'no-referrer', signal:controller.signal
+    });
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    return await response.json();
+  } catch (_) {
+    throw new Error('行事のデータを読み込めませんでした。通信状況を確認してもう一度お試しください。');
+  } finally { clearTimeout(timer); }
+}
+
 function readApi(params, timeout = 18000) {
+  const guestBase = publicGuestEndpoint();
+  if (guestBase) return readGuestApi(guestBase, params, timeout);
   return new Promise((resolve, reject) => {
     const cb = 'cp_' + makeId().replace(/-/g, '');
     const script = document.createElement('script');
@@ -741,7 +734,7 @@ function updateGuestEntry() {
   const entry = el('guest-entry');
   entry.hidden = guestScreen || !guestDeployment;
   const eid = normalizeEventId(el('inp-join-id').value);
-  if (!entry.hidden) entry.href = googleAppUrl(eid, 'guest', guestDeployment);
+  if (!entry.hidden) entry.href = publicGuestUrl(eid, guestDeployment);
   const teacher = el('teacher-entry');
   teacher.hidden = Boolean(hosted) || !teacherHostedOnly || requestedView === 'guest';
   if (!teacher.hidden) teacher.href = googleAppUrl(eid, 'teacher');
@@ -773,13 +766,17 @@ async function api(params) {
   if (params.action === 'getState') return checked(await (hosted ? hostedRequest(params) : readApi(params)));
   const requestId = params.requestId || makeId();
   if (hosted) return checked(await hostedRequest({...params, requestId}));
+  const guestBase = publicGuestEndpoint();
   const deadline = Date.now() + 40000;
   const body = JSON.stringify({...params, v:'4', requestId});
   const post = async () => {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), Math.max(1, Math.min(11000, deadline - Date.now())));
     try {
-      await fetch(GAS_URL, {method:'POST', mode:'no-cors', credentials:'include', body, signal:controller.signal});
+      await fetch(guestBase || GAS_URL, {
+        method:'POST', mode:'no-cors', credentials:guestBase ? 'omit' : 'include',
+        body, referrerPolicy:'no-referrer', signal:controller.signal
+      });
     } catch (_) {
       // POST受信後の切断でも、受付結果を確認してから再送する。
     } finally { clearTimeout(timer); }
@@ -799,12 +796,28 @@ async function api(params) {
   throw new Error('送信結果を確認できません。通信状況を確認してから、もう一度お試しください。');
 }
 
+// Pagesの参加画面に行事IDを渡す。GoogleのURLはデータの取得先として扱う。
+function publicGuestUrl(eid, endpoint) {
+  let base;
+  if (!hosted) {
+    base = location.href;
+  } else if (endpoint && deploymentUrl(endpoint) === staticGuestBase() && staticGuestBase() === productionGuestApi) {
+    base = 'https://manabitane.jp/kougai_check/';
+  } else {
+    return endpoint ? googleAppUrl(eid, 'guest', endpoint) : '';
+  }
+  const url = new URL(base);
+  url.search = ''; url.hash = '';
+  url.searchParams.set('view', 'guest');
+  if (/^[a-z0-9]{8}$/.test(eid)) url.searchParams.set('event', eid);
+  return url.href;
+}
+
 function inviteUrl(eid) {
-  if (guestScreen && (guestDeployment || hosted?.appUrl)) return googleAppUrl(eid, 'guest', guestDeployment || hosted.appUrl);
+  if (guestScreen || guestDeployment) return publicGuestUrl(eid, guestDeployment || hosted?.appUrl);
   if (hosted) return googleAppUrl(eid);
   const url = new URL(location.href);
-  url.search = ''; url.hash = '';
-  if (guestScreen) url.searchParams.set('view', 'guest');
+  url.hash = ''; url.search = '';
   url.searchParams.set('event', eid);
   return url.href;
 }
@@ -829,15 +842,15 @@ function displayGuestInvite() {
   if (box.hidden) return;
   const ready = Boolean(guestDeployment);
   el('guest-share-url').textContent = ready
-    ? googleAppUrl('', 'guest', guestDeployment) + '　行事ID：' + S.eventId
+    ? publicGuestUrl(S.eventId, guestDeployment) + '　行事ID：' + S.eventId
     : '外部公開したGASのURLを、スクリプトプロパティ GUEST_APP_URL に設定してください。';
   el('share-guest').hidden = !ready;
 }
 
 async function copyGuestInvite() {
   if (guestScreen || !guestDeployment || !S.eventId) return;
-  const message = [S.eventName, '外部参加用URL：' + googleAppUrl('', 'guest', guestDeployment),
-    '行事ID：' + S.eventId, 'スマホでURLを開き、行事IDとお名前を入力してください。'].join('\n');
+  const message = [S.eventName, '外部参加用URL：' + publicGuestUrl(S.eventId, guestDeployment),
+    '行事ID：' + S.eventId, 'スマホでURLを開き、お名前を入力してください。'].join('\n');
   await copyValue(message, '外部参加用URLと行事IDをコピーしました。');
 }
 
@@ -903,11 +916,8 @@ async function enterApp(eid) {
       el('join-status').textContent = '接続を確認しています。つながるとこのIDで参加します。';
       if (!(await checkConnection(eid))) return;
     }
+    el('qr-browser-help').hidden = true;
     el('join-status').textContent = '行事を確認中…';
-    if (guestScreen && !hosted && guestDeployment) {
-      location.assign(googleAppUrl(eid, 'guest', guestDeployment));
-      return;
-    }
     const data = await api({action:'getState', eventId:eid});
     S.eventId = eid;
     applyState(data);
@@ -916,7 +926,7 @@ async function enterApp(eid) {
       // Googleの外枠に行事コードを反映する。iframe のURLは招待には使わない。
       try { window.google.script.history?.replace({}, {view:guestScreen ? 'guest' : requestedView, event:eid}, ''); } catch (_) {}
     } else {
-      history.replaceState({}, '', inviteUrl(eid));
+      try { history.replaceState({}, '', inviteUrl(eid)); } catch (_) { /* 埋め込み画面では履歴の変更を制限する場合がある。 */ }
     }
     el('hdr-id').textContent = 'ID ' + eid;
     el('share-url').textContent = inviteUrl(eid);
@@ -1097,9 +1107,9 @@ function staticGuestBase() {
 
 function recoveryUrls() {
   const id = normalizeEventId(el('inp-join-id').value);
-  const direct = guestDeployment || (hosted && requestedView === 'guest' ? deploymentUrl(hosted.appUrl) : '') || (!hosted ? staticGuestBase() : '');
-  if (direct) {
-    const url = googleAppUrl(id, 'guest', direct);
+  const endpoint = guestDeployment || (hosted && requestedView === 'guest' ? deploymentUrl(hosted.appUrl) : '') || (!hosted ? staticGuestBase() : '');
+  if (endpoint) {
+    const url = publicGuestUrl(id, endpoint);
     return {open:url, copy:url};
   }
   if (hosted) return {open:'', copy:googleAppUrl(id, requestedView)};
@@ -1158,15 +1168,14 @@ async function boot() {
     if (id) el('join-button').click();
     else checkConnection('');
   });
+  // 外部公開を確認したAPIがあるPagesでは、参加者の現在のGoogleセッションに依存しない。
+  if (!hosted && requestedView !== 'teacher' && staticGuestBase()) {
+    guestDeployment = staticGuestBase();
+    guestScreen = guestSupported = teacherHostedOnly = connectionReady = true;
+  }
   updateGuestScreen();
   updateRecoveryLink();
   const initialId = normalizeEventId(eid);
-  if (window.kougaiQrHandoff) {
-    guestScreen = true;
-    guestDeployment = staticGuestBase();
-    updateGuestScreen();
-    return;
-  }
   const ready = await checkConnection(initialId);
   if (ready && initialId && !entryEdited) await enterApp(initialId);
 }
@@ -1217,6 +1226,9 @@ async function probeConnection(invitedId) {
     guestSupported = ['teacher','guest'].includes(capability.role);
     guestScreen = requestedView === 'guest' || capability.role === 'guest' || (!hosted && teacherHostedOnly);
     guestDeployment = deploymentUrl(capability.guestUrl);
+    if (!guestDeployment && hosted && deploymentUrl(hosted.appUrl) === productionGuestApi && staticGuestBase() === productionGuestApi) {
+      guestDeployment = productionGuestApi;
+    }
     connectionReady = true;
     updateGuestScreen();
     el('access-help').hidden = true;
