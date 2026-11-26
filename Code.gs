@@ -78,8 +78,8 @@ function capabilities_(role) {
   const result = {ok:true, version:4, role:role, guestAccess:true, teacherHostedOnly:true};
   const url = (PropertiesService.getScriptProperties().getProperty('GUEST_APP_URL') || '').trim();
   // Googleが発行する /exec URL のみを先生の共有リンクに使う。
-  const match = url.match(/^https:\/\/script\.google\.com\/(?:macros|a\/[A-Za-z0-9.-]+\/macros|a\/macros\/[A-Za-z0-9.-]+)\/s\/([A-Za-z0-9_-]+)\/exec$/);
-  if (match) result.guestUrl = 'https://script.google.com/macros/s/' + match[1] + '/exec';
+  const match = url.match(new RegExp('^https://script[.]google[.]com/(macros|a/[A-Za-z0-9.-]+/macros|a/macros/[A-Za-z0-9.-]+)/s/([A-Za-z0-9_-]+)/exec$'));
+  if (match) result.guestUrl = 'https://script.google.com/macros/s/' + match[2] + '/exec';
   return result;
 }
 
